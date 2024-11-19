@@ -7,6 +7,7 @@ import (
 )
 
 type Task struct {
+	TaskID      int    `json:"task_id"`
 	ProjectID   int    `json:"project_id"`
 	AssignedTo  int    `json:"assigned_to"`
 	Title       string `json:"title"`
@@ -38,5 +39,32 @@ func CreateTaskHandler(db *sql.DB) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Task created successfully"})
+	}
+}
+
+func GetTasksHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Zapytanie do bazy danych
+		rows, err := db.Query("SELECT task_id, project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by FROM Tasks")
+		if err != nil {
+			http.Error(w, "Failed to fetch tasks", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		// Przetwarzanie wyników
+		var tasks []Task
+		for rows.Next() {
+			var task Task
+			if err := rows.Scan(&task.TaskID, &task.ProjectID, &task.AssignedTo, &task.Title, &task.Description, &task.Status, &task.Priority, &task.StartDate, &task.DueDate, &task.CreatedBy); err != nil {
+				http.Error(w, "Failed to scan task", http.StatusInternalServerError)
+				return
+			}
+			tasks = append(tasks, task)
+		}
+
+		// Wysyłanie odpowiedzi
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(tasks)
 	}
 }

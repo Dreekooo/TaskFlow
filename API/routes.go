@@ -14,5 +14,9 @@ func SetupRoutes(db *sql.DB) *mux.Router {
 	r.HandleFunc("/projects", handlers.CreateProjectHandler(db)).Methods("POST")
 	r.HandleFunc("/tasks", handlers.CreateTaskHandler(db)).Methods("POST")
 
+	r.HandleFunc("/users", handlers.GetUsersHandler(db)).Methods("GET")
+	r.HandleFunc("/projects", handlers.GetProjectsHandler(db)).Methods("GET")
+	r.HandleFunc("/tasks", handlers.GetTasksHandler(db)).Methods("GET")
+
 	return r
 }

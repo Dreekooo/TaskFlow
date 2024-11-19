@@ -1,4 +1,4 @@
-CREATE TABLE Users (
+CREATE TABLE IF NOT EXISTS Users (
                        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                        email VARCHAR(255) NOT NULL UNIQUE,
                        username VARCHAR(50) NOT NULL UNIQUE,
@@ -8,7 +8,7 @@ CREATE TABLE Users (
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Projects (
+CREATE TABLE IF NOT EXISTS Projects (
                           project_id INTEGER PRIMARY KEY AUTOINCREMENT,
                           name VARCHAR(100),
                           description TEXT,
@@ -17,7 +17,7 @@ CREATE TABLE Projects (
                           FOREIGN KEY (created_by) REFERENCES Users(user_id)
 );
 
-CREATE TABLE ProjectUsers (
+CREATE TABLE IF NOT EXISTS ProjectUsers (
                               project_user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                               project_id INTEGER,
                               user_id INTEGER,
@@ -26,12 +26,12 @@ CREATE TABLE ProjectUsers (
                               FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE Roles (
+CREATE TABLE IF NOT EXISTS Roles (
                        role_id INTEGER PRIMARY KEY AUTOINCREMENT,
                        role_name VARCHAR(50)
 );
 
-CREATE TABLE Tasks (
+CREATE TABLE IF NOT EXISTS Tasks (
                        task_id INTEGER PRIMARY KEY AUTOINCREMENT,
                        project_id INTEGER,
                        assigned_to INTEGER,
@@ -50,17 +50,17 @@ CREATE TABLE Tasks (
                        FOREIGN KEY (priority) REFERENCES Priorities(priority_id)
 );
 
-CREATE TABLE Status (
+CREATE TABLE IF NOT EXISTS Status (
                         status_id INTEGER PRIMARY KEY AUTOINCREMENT,
                         status_name VARCHAR(50)
 );
 
-CREATE TABLE Priorities (
+CREATE TABLE IF NOT EXISTS Priorities (
                             priority_id INTEGER PRIMARY KEY AUTOINCREMENT,
                             priority_name VARCHAR(50)
 );
 
-CREATE TABLE TaskComments (
+CREATE TABLE IF NOT EXISTS TaskComments (
                               comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
                               task_id INTEGER,
                               user_id INTEGER,
