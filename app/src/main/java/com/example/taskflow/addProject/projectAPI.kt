@@ -5,6 +5,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,7 +55,6 @@ fun ProjectList(
             items(projects) { project ->
                 projectView(
                     projectName = project.name,
-                    projectDescription = project.description,
                     created_by = project.created_by,
                     Color.Gray,
                 )
@@ -67,7 +67,6 @@ fun ProjectList(
 @Composable
 fun projectView(
     projectName: String,
-    projectDescription: String,
     created_by: Int,
     color: Color
 ) {
@@ -82,7 +81,10 @@ fun projectView(
                     durationMillis = 800,
                     easing = FastOutSlowInEasing
                 )
-            ),
+            )
+            .clickable {
+
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {

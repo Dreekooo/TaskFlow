@@ -15,7 +15,7 @@ class projectsViewModel : ViewModel() {
     val projects: StateFlow<List<Project>> = _projects
 
     private val api: ProjectInterface = Retrofit.Builder()
-        .baseUrl("http://192.168.68.117:8080/")
+        .baseUrl("http://9999999999:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(ProjectInterface::class.java)
