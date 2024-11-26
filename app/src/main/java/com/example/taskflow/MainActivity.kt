@@ -22,7 +22,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             TaskFLowTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ProjectList(projectsViewModel())
+
+                    ProjectList(projectsViewModel(), innerPadding)
+
                 }
             }
         }

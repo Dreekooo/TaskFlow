@@ -1,29 +1,156 @@
 package com.example.taskflow.addProject
 
 import android.util.Log
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.taskflow.R
 
 @Composable
-fun ProjectList(viewModel: projectsViewModel, modifier: Modifier = Modifier) {
+fun ProjectList(
+    viewModel: projectsViewModel,
+    innerPaddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
+) {
     val projects by viewModel.projects.collectAsState()
 
     Log.d("APICOS", "${projects.size}")
 
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier
+            .padding(innerPaddingValues)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         if (projects.isEmpty()) {
             item { Text(text = "No projects available") }
         } else {
             items(projects) { project ->
-                Text(text = "Project ID: ${project.id}, Name: ${project.name}, desc")
+                projectView(
+                    projectName = project.name,
+                    projectDescription = project.description,
+                    created_by = project.created_by,
+                    Color.Gray,
+                )
                 Log.d("API", "Project ID: ${project.id}, Name: ${project.name}")
             }
         }
     }
 }
+
+@Composable
+fun projectView(
+    projectName: String,
+    projectDescription: String,
+    created_by: Int,
+    color: Color
+) {
+
+    Column(
+        modifier = Modifier
+            .width(346.dp)
+            .padding(25.dp)
+            .border(width = 3.dp, color = color, shape = RoundedCornerShape(15.dp))
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = FastOutSlowInEasing
+                )
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 15.dp,
+                    bottom = 5.dp
+                )
+                .fillMaxWidth()
+                .align(Alignment.Start),
+        ) {
+            Text(
+                text = projectName,
+                textAlign = TextAlign.Start,
+                fontFamily = FontFamily(
+                    Font(R.font.font_bold)
+                ),
+                fontSize = 22.sp,
+                style = TextStyle(fontWeight = FontWeight.ExtraBold)
+            )
+            Text(
+                text = "created by:" + created_by.toString(),
+                fontFamily = FontFamily(
+                    Font(R.font.font)
+                )
+            )
+        }
+        Row(
+            modifier = Modifier
+                .border(2.dp, color, shape = RoundedCornerShape(8.dp))
+                .fillMaxWidth(0.9f)
+                .padding(2.dp),
+        ) {}
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 10.dp,
+                    bottom = 5.dp
+                )
+                .align(Alignment.Start),
+        ) {
+            Text(
+                text = "start date: 12.04.2024",
+                fontFamily = FontFamily(
+                    Font(R.font.font)
+                ),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+
+            Text(
+                text = "end time: in progress",
+                fontFamily = FontFamily(
+                    Font(R.font.font)
+                ),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+        }
+    }
+}
+
+
+
