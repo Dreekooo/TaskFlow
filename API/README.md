@@ -16,7 +16,6 @@ TaskFlow API is a project management backend system designed to handle user acco
 7. [Test Database](#test-database)
 8. [API Endpoints](#api-endpoints)
 9. [Database Schema](#database-schema)
-10. [Future Improvements](#future-improvements)
 
 ---
 
@@ -204,6 +203,6 @@ The database schema (`schema.sql`) initializes the following tables:
 2. Use **cURL**:
    Example command:
    ```bash
-   curl -X POST http://localhost:8080/users    -H "Content-Type: application/json"    -d '{"email":"example@example.com","username":"exampleuser","first_name":"Example","last_name":"User","password_hash":"examplepassword"}'
+   curl -X POST http://localhost:8080/users/    -H "Content-Type: application/json"    -d '{"email":"example@example.com","username":"exampleuser","first_name":"Example","last_name":"User","password_hash":"examplepassword"}'
    ```
 
