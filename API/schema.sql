@@ -69,3 +69,25 @@ CREATE TABLE IF NOT EXISTS TaskComments (
                               FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
                               FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
+
+-- Insert priorities
+INSERT INTO Priorities (priority_id, priority_name) VALUES
+                                                        (1, 'Low'),
+                                                        (2, 'Medium'),
+                                                        (3, 'High'),
+                                                        (4, 'Critical');
+
+-- Insert statuses
+INSERT INTO Status (status_id, status_name) VALUES
+                                                (1, 'Backlog'),
+                                                (2, 'Selected'),
+                                                (3, 'Running'),
+                                                (4, 'In Review'),
+                                                (5, 'Done');
+
+-- Insert roles
+INSERT INTO Roles (role_id, role_name) VALUES
+                                           (1, 'Admin'),
+                                           (2, 'Manager'),
+                                           (3, 'Developer'),
+                                           (4, 'Tester');
