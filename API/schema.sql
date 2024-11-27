@@ -70,14 +70,19 @@ CREATE TABLE IF NOT EXISTS TaskComments (
                               FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
--- Insert priorities
+-- Usunięcie istniejących danych
+DELETE FROM Priorities;
+
+-- Wstawienie wartości
 INSERT INTO Priorities (priority_id, priority_name) VALUES
                                                         (1, 'Low'),
                                                         (2, 'Medium'),
                                                         (3, 'High'),
                                                         (4, 'Critical');
 
--- Insert statuses
+-- Usunięcie istniejących danych z tabeli Status
+DELETE FROM Status;
+
 INSERT INTO Status (status_id, status_name) VALUES
                                                 (1, 'Backlog'),
                                                 (2, 'Selected'),
@@ -85,7 +90,9 @@ INSERT INTO Status (status_id, status_name) VALUES
                                                 (4, 'In Review'),
                                                 (5, 'Done');
 
--- Insert roles
+-- Usunięcie istniejących danych z tabeli Roles
+DELETE FROM Roles;
+
 INSERT INTO Roles (role_id, role_name) VALUES
                                            (1, 'Admin'),
                                            (2, 'Manager'),

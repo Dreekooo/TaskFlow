@@ -199,8 +199,8 @@ func RegisterUserHandler(db *sql.DB) http.HandlerFunc {
 func LoginUserHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
+			Identifier string `json:"identifier"` // Can be email or username
+			Password   string `json:"password"`
 		}
 
 		err := json.NewDecoder(r.Body).Decode(&credentials)
@@ -209,25 +209,31 @@ func LoginUserHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Pobierz hash hasła z bazy danych
+		// Query the database for either email or username
 		var storedHash string
-		err = db.QueryRow("SELECT password_hash FROM Users WHERE email = ?", credentials.Email).Scan(&storedHash)
+		err = db.QueryRow(`
+			SELECT password_hash 
+			FROM Users 
+			WHERE email = ? OR username = ?`,
+			credentials.Identifier, credentials.Identifier,
+		).Scan(&storedHash)
+
 		if err != nil {
 			if err == sql.ErrNoRows {
-				http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+				http.Error(w, "Invalid email/username or password", http.StatusUnauthorized)
 				return
 			}
 			http.Error(w, "Failed to fetch user", http.StatusInternalServerError)
 			return
 		}
 
-		// Porównaj hasło
+		// Compare the password hash
 		if utils.HashPassword(credentials.Password) != storedHash {
-			http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+			http.Error(w, "Invalid email/username or password", http.StatusUnauthorized)
 			return
 		}
 
-		// Logowanie zakończone sukcesem
+		// Login successful
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
 	}
