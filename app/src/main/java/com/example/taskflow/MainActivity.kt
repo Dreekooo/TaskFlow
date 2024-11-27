@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskflow.addProject.ProjectList
-import com.example.taskflow.addProject.projectsViewModel
+import com.example.taskflow.addProject.ProjectsViewModel
 import com.example.taskflow.ui.theme.TaskFLowTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
             TaskFLowTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-                    ProjectList(projectsViewModel(), innerPadding)
+                    ProjectList(ProjectsViewModel(), innerPadding)
 
                 }
             }

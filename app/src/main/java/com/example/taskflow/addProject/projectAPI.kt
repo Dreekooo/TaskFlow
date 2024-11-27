@@ -18,8 +18,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,13 +38,12 @@ import com.example.taskflow.R
 
 @Composable
 fun ProjectList(
-    viewModel: projectsViewModel,
+    viewModel: ProjectsViewModel,
     innerPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val projects by viewModel.projects.collectAsState()
 
-    Log.d("APICOS", "${projects.size}")
 
     LazyColumn(
         modifier = modifier
@@ -53,12 +56,24 @@ fun ProjectList(
             item { Text(text = "No projects available") }
         } else {
             items(projects) { project ->
+                var userName by remember { mutableStateOf("") }
+
+                LaunchedEffect(project.created_by) {
+                    viewModel.fetchUserById(project.created_by) { user ->
+                        userName = user.username
+                    }
+                }
+
                 projectView(
                     projectName = project.name,
-                    created_by = project.created_by,
-                    Color.Gray,
+                    created_by = userName,
+                    Color.Gray
                 )
-                Log.d("API", "Project ID: ${project.id}, Name: ${project.name}")
+
+                Log.d(
+                    "API",
+                    "Project ID: ${project.id}, Name: ${project.name}, Created By: $userName"
+                )
             }
         }
     }
@@ -67,7 +82,7 @@ fun ProjectList(
 @Composable
 fun projectView(
     projectName: String,
-    created_by: Int,
+    created_by: String,
     color: Color
 ) {
 
@@ -109,7 +124,7 @@ fun projectView(
                 style = TextStyle(fontWeight = FontWeight.ExtraBold)
             )
             Text(
-                text = "created by:" + created_by.toString(),
+                text = "created by: " + created_by,
                 fontFamily = FontFamily(
                     Font(R.font.font)
                 )

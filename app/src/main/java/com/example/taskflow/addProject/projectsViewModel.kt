@@ -3,6 +3,8 @@ package com.example.taskflow.addProject
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskflow.addProject.users.User
+import com.example.taskflow.addProject.users.UserInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,29 +12,48 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class projectsViewModel : ViewModel() {
+class ProjectsViewModel : ViewModel() {
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
     val projects: StateFlow<List<Project>> = _projects
 
-    private val api: ProjectInterface = Retrofit.Builder()
-        .baseUrl("http://9999999999:8080/")
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-        .create(ProjectInterface::class.java)
+
+    private val api: ProjectInterface = retrofit.create(ProjectInterface::class.java)
+    private val userApi: UserInterface = retrofit.create(UserInterface::class.java)
 
     init {
         fetchProjects()
     }
 
     private fun fetchProjects() {
+        fetchData({ api.getProjects() }, { projects ->
+            _projects.value = projects
+        })
+    }
+
+    fun fetchUserById(userId: Int, onSuccess: (User) -> Unit) {
+        fetchData({ userApi.getUser(userId) }, onSuccess)
+    }
+
+    private inline fun <T> fetchData(
+        crossinline apiCall: suspend () -> T,
+        crossinline onSuccess: (T) -> Unit
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val fetchedProjects = api.getProjects()
-                Log.d("API_FETCH", "Fetched Projects: $fetchedProjects")
-                _projects.value = fetchedProjects
+                val result = apiCall()
+                Log.d("API_FETCH", "Fetched data: $result")
+                onSuccess(result)
             } catch (e: Exception) {
-                Log.e("API_FETCH_ERROR", "Error fetching projects", e)
+                Log.e("API_FETCH_ERROR", "Error fetching data", e)
             }
         }
     }
 }
+
