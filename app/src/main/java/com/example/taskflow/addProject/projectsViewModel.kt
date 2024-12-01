@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.taskflow.addProject.users.User
 import com.example.taskflow.addProject.users.UserInterface
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ class ProjectsViewModel : ViewModel() {
 
     init {
         fetchProjects()
+        startAutoRefresh()
     }
 
     private fun fetchProjects() {
@@ -39,6 +41,19 @@ class ProjectsViewModel : ViewModel() {
 
     fun fetchUserById(userId: Int, onSuccess: (User) -> Unit) {
         fetchData({ userApi.getUser(userId) }, onSuccess)
+    }
+
+    private fun startAutoRefresh() {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                try {
+                    fetchProjects()
+                    delay(5000)
+                } catch (e: Exception) {
+                    Log.e("AUTO_REFRESH_ERROR", "Error during auto-refresh", e)
+                }
+            }
+        }
     }
 
     private inline fun <T> fetchData(
@@ -56,4 +71,3 @@ class ProjectsViewModel : ViewModel() {
         }
     }
 }
-

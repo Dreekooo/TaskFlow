@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,43 +41,44 @@ import com.example.taskflow.R
 @Composable
 fun ProjectList(
     viewModel: ProjectsViewModel,
-    innerPaddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val projects by viewModel.projects.collectAsState()
 
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        LazyColumn(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (projects.isEmpty()) {
+                item { Text(text = "No projects available") }
+            } else {
+                items(projects) { project ->
+                    var userName by remember { mutableStateOf("") }
 
-    LazyColumn(
-        modifier = modifier
-            .padding(innerPaddingValues)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (projects.isEmpty()) {
-            item { Text(text = "No projects available") }
-        } else {
-            items(projects) { project ->
-                var userName by remember { mutableStateOf("") }
-
-                LaunchedEffect(project.created_by) {
-                    viewModel.fetchUserById(project.created_by) { user ->
-                        userName = user.username
+                    LaunchedEffect(project.created_by) {
+                        viewModel.fetchUserById(project.created_by) { user ->
+                            userName = user.username
+                        }
                     }
+
+                    projectView(
+                        projectName = project.name,
+                        created_by = userName,
+                        Color.Gray
+                    )
+
+                    Log.d(
+                        "API",
+                        "Project ID: ${project.id}, Name: ${project.name}, Created By: $userName"
+                    )
                 }
-
-                projectView(
-                    projectName = project.name,
-                    created_by = userName,
-                    Color.Gray
-                )
-
-                Log.d(
-                    "API",
-                    "Project ID: ${project.id}, Name: ${project.name}, Created By: $userName"
-                )
             }
         }
+
     }
 }
 
@@ -89,7 +92,7 @@ fun projectView(
     Column(
         modifier = Modifier
             .width(346.dp)
-            .padding(25.dp)
+            .padding(20.dp)
             .border(width = 3.dp, color = color, shape = RoundedCornerShape(15.dp))
             .animateContentSize(
                 animationSpec = tween(

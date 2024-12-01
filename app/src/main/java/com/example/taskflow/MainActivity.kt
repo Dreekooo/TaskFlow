@@ -21,11 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskFLowTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    ProjectList(ProjectsViewModel(), innerPadding)
-
-                }
+                ProjectList(ProjectsViewModel())
             }
         }
     }
