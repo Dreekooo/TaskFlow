@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TaskFLow</string>
+    <string name="plus_content">+</string>
 </resources>
