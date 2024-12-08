@@ -8,23 +8,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,28 +37,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskflow.R
+import com.example.taskflow.buttons.AddProjectButton
 
 @Composable
 fun ProjectList(
-    viewModel: ProjectsViewModel,
+    viewModel: ProjectsAPIViewModel,
     modifier: Modifier = Modifier,
+    projectViewModel: ProjectViewModel
 ) {
     val projects by viewModel.projects.collectAsState()
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp, end = 20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                AddProjectButton()
-            }
+    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 20.dp, end = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            AddProjectButton(projectViewModel)
         }
-    ) { innerPadding ->
+    }) { innerPadding ->
         LazyColumn(
             modifier = modifier
                 .padding(innerPadding)
@@ -102,13 +92,18 @@ fun ProjectList(
         }
 
     }
+
+    /*
+    This is a dialog to add new Project
+     */
+    AddProjectDialog(
+        projectsViewModel = projectViewModel
+    )
 }
 
 @Composable
 fun projectView(
-    projectName: String,
-    created_by: String,
-    color: Color
+    projectName: String, created_by: String, color: Color
 ) {
 
     Column(
@@ -118,8 +113,7 @@ fun projectView(
             .border(width = 3.dp, color = color, shape = RoundedCornerShape(15.dp))
             .animateContentSize(
                 animationSpec = tween(
-                    durationMillis = 800,
-                    easing = FastOutSlowInEasing
+                    durationMillis = 800, easing = FastOutSlowInEasing
                 )
             )
             .clickable {
@@ -131,26 +125,18 @@ fun projectView(
         Column(
             modifier = Modifier
                 .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 15.dp,
-                    bottom = 5.dp
+                    start = 16.dp, end = 16.dp, top = 15.dp, bottom = 5.dp
                 )
                 .fillMaxWidth()
                 .align(Alignment.Start),
         ) {
             Text(
-                text = projectName,
-                textAlign = TextAlign.Start,
-                fontFamily = FontFamily(
+                text = projectName, textAlign = TextAlign.Start, fontFamily = FontFamily(
                     Font(R.font.font_bold)
-                ),
-                fontSize = 22.sp,
-                style = TextStyle(fontWeight = FontWeight.ExtraBold)
+                ), fontSize = 22.sp, style = TextStyle(fontWeight = FontWeight.ExtraBold)
             )
             Text(
-                text = "created by: " + created_by,
-                fontFamily = FontFamily(
+                text = "created by: " + created_by, fontFamily = FontFamily(
                     Font(R.font.font)
                 )
             )
@@ -166,51 +152,21 @@ fun projectView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 10.dp,
-                    bottom = 5.dp
+                    start = 16.dp, end = 16.dp, top = 10.dp, bottom = 5.dp
                 )
                 .align(Alignment.Start),
         ) {
             Text(
-                text = "start date: 12.04.2024",
-                fontFamily = FontFamily(
+                text = "start date: 12.04.2024", fontFamily = FontFamily(
                     Font(R.font.font)
-                ),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
+                ), fontSize = 14.sp, modifier = Modifier.padding(bottom = 10.dp)
             )
 
             Text(
-                text = "end time: in progress",
-                fontFamily = FontFamily(
+                text = "end time: in progress", fontFamily = FontFamily(
                     Font(R.font.font)
-                ),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
+                ), fontSize = 14.sp, modifier = Modifier.padding(bottom = 10.dp)
             )
         }
     }
 }
-
-
-@Composable
-fun AddProjectButton() {
-    FloatingActionButton(
-        onClick = {
-        },
-        modifier = Modifier.size(70.dp),
-        shape = CircleShape,
-        contentColor = colorResource(R.color.button_description),
-        containerColor = colorResource(R.color.button_background)
-    ) {
-        androidx.compose.material3.Icon(
-            Icons.Rounded.Add,
-            contentDescription = stringResource(R.string.plus_content),
-            modifier = Modifier.size(34.dp)
-        )
-    }
-}
-
-

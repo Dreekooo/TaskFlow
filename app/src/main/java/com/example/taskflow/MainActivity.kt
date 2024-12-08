@@ -4,15 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.taskflow.addProject.ProjectList
-import com.example.taskflow.addProject.ProjectsViewModel
+import com.example.taskflow.addProject.ProjectViewModel
+import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.ui.theme.TaskFLowTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskFLowTheme {
-                ProjectList(ProjectsViewModel())
+                ProjectList(ProjectsAPIViewModel(), projectViewModel = ProjectViewModel())
             }
         }
     }
