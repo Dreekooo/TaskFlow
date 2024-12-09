@@ -3,7 +3,7 @@ package com.example.taskflow.addProject.users
 import java.sql.Timestamp
 
 data class User(
-    val user: Int,
+    val id: Int,
     val email: String,
     val username: String,
     val first_name: String,

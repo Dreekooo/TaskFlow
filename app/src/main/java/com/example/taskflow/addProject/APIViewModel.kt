@@ -1,6 +1,10 @@
 package com.example.taskflow.addProject
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskflow.addProject.users.User
@@ -20,8 +24,12 @@ class ProjectsAPIViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
+    private val _allUsers =
+        MutableStateFlow<List<User>>(emptyList())
+    val allUsers: StateFlow<List<User>> = _allUsers
+
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://99999999:8080/")
+        .baseUrl("http://192.168.68.106:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -30,6 +38,7 @@ class ProjectsAPIViewModel : ViewModel() {
 
     init {
         fetchProjects()
+        fetchAllUsers(1)
         startAutoRefresh()
     }
 
@@ -43,11 +52,20 @@ class ProjectsAPIViewModel : ViewModel() {
         fetchData({ userApi.getUser(userId) }, onSuccess)
     }
 
+    private fun fetchAllUsers(excludedId: Int) {
+        fetchData({ userApi.getAllUsers() }, { users ->
+            val filteredUsers = users.filter { it.id != excludedId }
+            _allUsers.value = filteredUsers
+            Log.d("FILTERED_USERS", "Users excluding ID $excludedId: $filteredUsers")
+        })
+    }
+
     private fun startAutoRefresh() {
         viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 try {
                     fetchProjects()
+                    fetchAllUsers(1)
                     delay(5000)
                 } catch (e: Exception) {
                     Log.e("AUTO_REFRESH_ERROR", "Error during auto-refresh", e)
@@ -70,4 +88,20 @@ class ProjectsAPIViewModel : ViewModel() {
             }
         }
     }
+
+    private val _selectedUsers = MutableStateFlow<List<String>>(emptyList())
+    val selectedUsers: StateFlow<List<String>> = _selectedUsers
+
+    fun onSelectionChanged(userId: String) {
+        _selectedUsers.value = if (_selectedUsers.value.contains(userId)) {
+            _selectedUsers.value - userId
+        } else {
+            if (_selectedUsers.value.size < 2) {
+                _selectedUsers.value + userId
+            } else {
+                _selectedUsers.value.drop(1) + userId
+            }
+        }
+    }
+
 }

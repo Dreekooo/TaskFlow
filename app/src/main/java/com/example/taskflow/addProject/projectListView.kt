@@ -41,11 +41,11 @@ import com.example.taskflow.buttons.AddProjectButton
 
 @Composable
 fun ProjectList(
-    viewModel: ProjectsAPIViewModel,
+    apiViewModel: ProjectsAPIViewModel,
     modifier: Modifier = Modifier,
     projectViewModel: ProjectViewModel
 ) {
-    val projects by viewModel.projects.collectAsState()
+    val projects by apiViewModel.projects.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
         Row(
@@ -72,7 +72,7 @@ fun ProjectList(
                     var userName by remember { mutableStateOf("") }
 
                     LaunchedEffect(project.created_by) {
-                        viewModel.fetchUserById(project.created_by) { user ->
+                        apiViewModel.fetchUserById(project.created_by) { user ->
                             userName = user.username
                         }
                     }
@@ -97,7 +97,8 @@ fun ProjectList(
     This is a dialog to add new Project
      */
     AddProjectDialog(
-        projectsViewModel = projectViewModel
+        projectsViewModel = projectViewModel,
+        apiViewModel = apiViewModel
     )
 }
 

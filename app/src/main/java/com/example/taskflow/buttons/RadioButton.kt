@@ -24,48 +24,54 @@ import com.example.taskflow.R
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.ui.theme.iconColor
+import com.example.taskflow.ui.theme.radioButton
+import com.example.taskflow.ui.theme.textColor
 
 @Composable
 fun CustomRadioButton(
     title: String,
     color: Color,
     viewModel: ProjectViewModel,
-    currentValue: String,
+    selectedValues: List<String>,
     onSelectionChanged: (String) -> Unit,
 ) {
+    val isChecked = title in selectedValues
+
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
+            onSelectionChanged(title)
             viewModel.enabled = !viewModel.enabled
         }
     ) {
         IconToggleButton(
-            checked = currentValue == title,
-            onCheckedChange = { isChecked ->
-                if (isChecked) {
-                    onSelectionChanged(title)
-                }
-            },
+            checked = isChecked,
+            onCheckedChange = {
+                onSelectionChanged(title)
+            }
         ) {
             Icon(
-                imageVector = if (currentValue == title) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
+                imageVector = if (isChecked) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = "Radio button icon",
-                tint = color,
+                tint = radioButton,
                 modifier = Modifier.size(30.dp)
             )
-            if (currentValue == title) {
+
+            if (isChecked) {
                 Icon(
                     imageVector = Icons.Rounded.Check,
-                    contentDescription = "Radio button",
+                    contentDescription = "Selected checkmark",
                     tint = iconColor,
+                    modifier = Modifier.size(18.dp)
                 )
                 viewModel.enabled = true
             }
         }
+
         Text(
             text = title,
-            color = MaterialTheme.colorScheme.tertiaryContainer,
+            color = textColor,
             fontSize = 18.sp,
             fontFamily = FontFamily(
                 Font(R.font.font)
@@ -73,3 +79,4 @@ fun CustomRadioButton(
         )
     }
 }
+
