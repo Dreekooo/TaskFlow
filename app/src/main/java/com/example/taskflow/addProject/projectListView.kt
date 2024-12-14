@@ -55,7 +55,9 @@ fun ProjectList(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
-            AddProjectButton(projectViewModel)
+            AddProjectButton(
+                projectViewModel,
+            )
         }
     }) { innerPadding ->
         LazyColumn(

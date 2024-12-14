@@ -11,3 +11,5 @@ data class User(
     @SerializedName("last_name") val last_name: String,
     @SerializedName("created_by") val created_at: Timestamp
 )
+
+

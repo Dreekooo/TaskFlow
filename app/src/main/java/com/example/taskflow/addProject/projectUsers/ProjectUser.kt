@@ -8,3 +8,10 @@ data class ProjectUser(
     @SerializedName("user_id") val userId: Int,
     @SerializedName("role") val role: Int
 )
+
+
+data class ProjectUserPOST(
+    @SerializedName("project_id") val projectId: Int,
+    @SerializedName("user_id") val userId: Int,
+    @SerializedName("role") val role: Int
+)

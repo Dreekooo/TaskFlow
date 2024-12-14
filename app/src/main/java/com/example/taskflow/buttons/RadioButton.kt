@@ -10,7 +10,6 @@ import androidx.compose.material.icons.rounded.Circle
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,31 +29,32 @@ import com.example.taskflow.ui.theme.textColor
 @Composable
 fun CustomRadioButton(
     title: String,
+    userId: Int,
     color: Color,
     viewModel: ProjectViewModel,
-    selectedValues: List<String>,
-    onSelectionChanged: (String) -> Unit,
+    selectedValues: List<Int>,
+    onSelectionChanged: (Int) -> Unit,
 ) {
-    val isChecked = title in selectedValues
+    val isChecked = userId in selectedValues
 
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
-            onSelectionChanged(title)
+            onSelectionChanged(userId)
             viewModel.enabled = !viewModel.enabled
         }
     ) {
         IconToggleButton(
             checked = isChecked,
             onCheckedChange = {
-                onSelectionChanged(title)
+                onSelectionChanged(userId)
             }
         ) {
             Icon(
                 imageVector = if (isChecked) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = "Radio button icon",
-                tint = radioButton,
+                tint = color,
                 modifier = Modifier.size(30.dp)
             )
 

@@ -105,7 +105,7 @@ fun AddProjectDialog(
                         Spacer(modifier = Modifier.padding(5.dp))
                         AllUsers(apiViewModel = apiViewModel, projectsViewModel = projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        ButtonsProjects(viewModel = projectsViewModel)
+                        ButtonsProjects(viewModel = projectsViewModel, apiViewModel)
                     }
                 }
             }
@@ -285,6 +285,7 @@ fun AllUsers(
             CustomRadioButton(
                 title = user.username,
                 color = radioButton,
+                userId = user.id,
                 viewModel = projectsViewModel,
                 selectedValues = selectedUsers,
                 onSelectionChanged = { selectedUser ->
@@ -298,13 +299,13 @@ fun AllUsers(
 }
 
 @Composable
-fun ButtonsProjects(viewModel: ProjectViewModel) {
+fun ButtonsProjects(viewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CloseButton(viewModel)
-        SubmitButton(viewModel)
+        SubmitButton(viewModel, apiViewModel)
     }
 }

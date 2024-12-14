@@ -15,6 +15,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.taskflow.addProject.ProjectViewModel
+import com.example.taskflow.addProject.ProjectsAPIViewModel
 
 @Composable
 fun CloseButton(
@@ -39,11 +40,11 @@ fun CloseButton(
 
 @Composable
 fun SubmitButton(
-    projectViewModel: ProjectViewModel
+    projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
 ) {
     FloatingActionButton(
         onClick = {
-
+            fetchProject(projectViewModel = projectViewModel, apiViewModel = apiViewModel)
         },
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
@@ -51,15 +52,15 @@ fun SubmitButton(
         containerColor = colorResource(R.color.button_background)
     ) {
         Icon(
-            Icons.Rounded.Check,
-            contentDescription = "",
-            modifier = Modifier.size(34.dp)
+            Icons.Rounded.Check, contentDescription = "", modifier = Modifier.size(34.dp)
         )
     }
 }
 
 @Composable
-fun AddProjectButton(projectViewModel: ProjectViewModel) {
+fun AddProjectButton(
+    projectViewModel: ProjectViewModel,
+) {
     FloatingActionButton(
         onClick = {
             projectViewModel.isDialogShow = true
@@ -75,4 +76,13 @@ fun AddProjectButton(projectViewModel: ProjectViewModel) {
             modifier = Modifier.size(34.dp)
         )
     }
+}
+
+fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
+    apiViewModel.addProject(
+        projectViewModel.projectName,
+        projectViewModel.projectDescription,
+        1
+    )
+    projectViewModel.onDismissRequest()
 }

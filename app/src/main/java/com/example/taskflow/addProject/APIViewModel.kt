@@ -3,6 +3,9 @@ package com.example.taskflow.addProject
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskflow.addProject.projectUsers.POSTUsersInterface
+import com.example.taskflow.addProject.projectUsers.ProjectUser
+import com.example.taskflow.addProject.projectUsers.ProjectUserPOST
 import com.example.taskflow.addProject.users.User
 import com.example.taskflow.addProject.users.UserInterface
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +13,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -31,6 +37,7 @@ class ProjectsAPIViewModel : ViewModel() {
 
     private val api: ProjectInterface = retrofit.create(ProjectInterface::class.java)
     private val userApi: UserInterface = retrofit.create(UserInterface::class.java)
+
 
     init {
         fetchProjects()
@@ -62,7 +69,7 @@ class ProjectsAPIViewModel : ViewModel() {
                 try {
                     fetchProjects()
                     fetchAllUsers(1)
-                    delay(5000)
+                    delay(1000)
                 } catch (e: Exception) {
                     Log.e("AUTO_REFRESH_ERROR", "Error during auto-refresh", e)
                 }
@@ -85,10 +92,10 @@ class ProjectsAPIViewModel : ViewModel() {
         }
     }
 
-    private val _selectedUsers = MutableStateFlow<List<String>>(emptyList())
-    val selectedUsers: StateFlow<List<String>> = _selectedUsers
+    private val _selectedUsers = MutableStateFlow<List<Int>>(emptyList())
+    val selectedUsers: StateFlow<List<Int>> = _selectedUsers
 
-    fun onSelectionChanged(userId: String) {
+    fun onSelectionChanged(userId: Int) {
         _selectedUsers.value = if (_selectedUsers.value.contains(userId)) {
             _selectedUsers.value - userId
         } else {
@@ -99,5 +106,41 @@ class ProjectsAPIViewModel : ViewModel() {
             }
         }
     }
+
+    fun addProjectUser(projectId: Int, userId: Int, role: Int) {
+        val projectUser = ProjectUserPOST(projectId, userId, role)
+
+        val projectUserApi = retrofit.create(POSTUsersInterface::class.java)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = projectUserApi.addProjectUser(projectUser)
+            } catch (e: Exception) {
+                Log.e("API_EXCEPTION", "Exception: $e")
+            }
+        }
+    }
+
+
+    fun addProject(name: String, description: String, createdBy: Int) {
+        val project = ProjectPost(name, description, createdBy)
+
+        Log.d("dupa", "dupa")
+        val projectApi = retrofit.create(POSTUsersInterface::class.java)
+
+        projectApi.addProject(project).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d("API_SUCCESS", "Project added successfully!")
+                } else {
+                    Log.e("API_ERROR", "Error adding project: ${response.message()}")
+                }
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("API_EXCEPTION", "Exception: $t")
+            }
+        })
+    }
+
 
 }

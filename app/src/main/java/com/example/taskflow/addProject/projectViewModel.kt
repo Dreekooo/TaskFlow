@@ -16,5 +16,9 @@ class ProjectViewModel : ViewModel() {
 
     fun onDismissRequest() {
         isDialogShow = false
+        enabled = false
+        projectDescription = ""
+        projectName = ""
+        roleName = ""
     }
 }
