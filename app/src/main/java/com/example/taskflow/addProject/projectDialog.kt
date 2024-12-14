@@ -1,6 +1,5 @@
 package com.example.taskflow.addProject
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,23 +22,17 @@ import androidx.compose.material.icons.rounded.Task
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -51,9 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taskflow.R
-import com.example.taskflow.addProject.users.User
 import com.example.taskflow.buttons.CloseButton
 import com.example.taskflow.buttons.CustomRadioButton
 import com.example.taskflow.buttons.SubmitButton
@@ -106,9 +97,11 @@ fun AddProjectDialog(
                     )
                 ) {
                     Column(modifier = Modifier.padding(top = 25.dp, bottom = 15.dp)) {
-                        projectName(projectsViewModel)
+                        ProjectName(projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         projectDescription(projectsViewModel)
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        RoleName(projectsViewModel = projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         AllUsers(apiViewModel = apiViewModel, projectsViewModel = projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
@@ -122,7 +115,7 @@ fun AddProjectDialog(
 
 
 @Composable
-fun projectName(
+fun ProjectName(
     projectsViewModel: ProjectViewModel
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -150,17 +143,6 @@ fun projectName(
                 color = textEdit,
                 shape = RoundedCornerShape(10.dp)
             ),
-        placeholder = {
-            Text(
-                text = "type something...",
-                fontSize = 12.sp,
-                fontFamily = FontFamily(
-                    Font(R.font.font)
-                ),
-                textAlign = TextAlign.Center,
-                color = placeholder
-            )
-        },
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done
         ),
@@ -232,6 +214,51 @@ fun projectDescription(projectsViewModel: ProjectViewModel) {
             )
         )
     }
+}
+
+@Composable
+fun RoleName(
+    projectsViewModel: ProjectViewModel
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    Text(
+        text = "role name:",
+        textAlign = TextAlign.Left,
+        modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+        color = textColor,
+        fontFamily = FontFamily(
+            Font(R.font.font)
+        )
+    )
+    OutlinedTextField(
+        value = projectsViewModel.roleName,
+        onValueChange = {
+            projectsViewModel.roleName = it
+        },
+        textStyle = TextStyle(textAlign = TextAlign.Justify),
+        modifier = Modifier
+            .size(500.dp, 50.dp)
+            .padding(start = 17.dp, end = 25.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .border(
+                width = 2.dp,
+                color = textEdit,
+                shape = RoundedCornerShape(10.dp)
+            ),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { keyboardController?.hide() }
+        ),
+        shape = RoundedCornerShape(10.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = textEdit,
+            unfocusedBorderColor = textEdit,
+            focusedContainerColor = textEdit,
+            unfocusedContainerColor = textEdit
+        )
+    )
 }
 
 

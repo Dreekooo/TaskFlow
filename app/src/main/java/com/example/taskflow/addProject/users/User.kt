@@ -5,9 +5,9 @@ import java.sql.Timestamp
 
 data class User(
     @SerializedName("user_id") val id: Int,
-    val email: String,
-    val username: String,
-    val first_name: String,
-    val last_name: String,
-    val created_at: Timestamp
+    @SerializedName("email") val email: String,
+    @SerializedName("username") val username: String,
+    @SerializedName("first_name") val first_name: String,
+    @SerializedName("last_name") val last_name: String,
+    @SerializedName("created_by") val created_at: Timestamp
 )

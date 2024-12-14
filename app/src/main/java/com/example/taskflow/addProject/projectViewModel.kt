@@ -10,6 +10,7 @@ class ProjectViewModel : ViewModel() {
     var enabled by mutableStateOf(false)
     var projectDescription by mutableStateOf("")
     var projectName by mutableStateOf("")
+    var roleName by mutableStateOf("")
     var isDialogShow by mutableStateOf(false)
 
 

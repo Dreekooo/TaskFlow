@@ -1,8 +1,10 @@
 package com.example.taskflow.addProject
 
+import com.google.gson.annotations.SerializedName
+
 data class Project(
-    val id: Int,
-    val name: String,
-    val description: String,
-    val created_by: Int
+    @SerializedName("project_id") val id: Int,
+    @SerializedName("name") val name: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("created_by") val created_by: Int
 )
