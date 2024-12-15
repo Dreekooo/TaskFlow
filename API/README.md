@@ -16,6 +16,8 @@ TaskFlow API is a project management backend system designed to handle user acco
 7. [Test Database](#test-database)
 8. [API Endpoints](#api-endpoints)
 9. [Database Schema](#database-schema)
+10. [Testing the API](#testing-the-api)
+11. [Authorization with JWT](#authorization-with-jwt)
 
 ---
 
@@ -45,9 +47,12 @@ API/
 ├── test-files/
 │   ├── taskflow.db               # Pre-loaded test SQLite database
 │   ├── taskflow.exe              # Pre-loaded test executable file to run the server
+├── middleware/                   # Middleware (e.g., JWT authentication)
+│   ├── auth.go                   # JWT middleware
 ├── utils/                        # Utility files
 │   ├── db.go                     # Database connection and setup
 │   ├── hash_password.go          # Password hashing utility
+│   ├── jwt.go                    # JWT generation and validation
 ├── go.mod                        # Go module dependencies
 ├── main.go                       # Application entry point
 ├── routes.go                     # Routing configuration
@@ -102,7 +107,7 @@ Before using this API, ensure the following:
 
 To build the API into an executable:
 ```bash
-go build -x -o taskflow-api
+go build -x
 ```
 
 ---
@@ -135,11 +140,14 @@ A pre-filled SQLite test database is included in the repository: **`test-files/t
 ## API Endpoints
 
 ### **Users**
+- `POST /register/` - Register a new user
+- `POST /login/` - Authenticate and get a JWT token
 - `POST /users/` - Create a user
 - `GET /users/` - Get all users
 - `GET /users/{id}/` - Get user by ID
 - `PUT /users/{id}/` - Update user
 - `DELETE /users/{id}/` - Delete user
+- `GET /users/` - Get all users (requires JWT)
 
 ### **Projects**
 - `POST /projects/` - Create a project
@@ -205,4 +213,28 @@ The database schema (`schema.sql`) initializes the following tables:
    ```bash
    curl -X POST http://localhost:8080/users/    -H "Content-Type: application/json"    -d '{"email":"example@example.com","username":"exampleuser","first_name":"Example","last_name":"User","password_hash":"examplepassword"}'
    ```
+   
+---
 
+## Authorization with JWT
+
+This API uses **JWT** (JSON Web Token) for authentication and authorization.
+
+1. **Login to obtain a token**:
+   - Endpoint: `POST /login`
+   - Response:
+     ```json
+     {
+         "message": "Login successful",
+         "token": "<your-jwt-token>"
+     }
+     ```
+
+2. **Send the token in the `Authorization` header**:
+   ```http
+   Authorization: Bearer <your-jwt-token>
+   ```
+
+3. **Example of a protected endpoint**:
+   - Endpoint: `DELETE /api/users/delete/`
+   - Description: Deletes the authenticated user's account.

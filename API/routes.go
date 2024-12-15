@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/gorilla/mux"
 	"taskflow/handlers" // Poprawiona ścieżka importu
+	"taskflow/middleware"
 )
 
 func SetupRoutes(db *sql.DB) *mux.Router {
@@ -40,11 +41,17 @@ func SetupRoutes(db *sql.DB) *mux.Router {
 	r.HandleFunc("/tasks/{id:[0-9]+}/", handlers.UpdateTaskHandler(db)).Methods("PUT")    // Aktualizacja Task
 	r.HandleFunc("/tasks/{id:[0-9]+}/", handlers.DeleteTaskHandler(db)).Methods("DELETE") // Usuwanie Task
 
-	r.HandleFunc("/project-users/{id:[0-9]+}", handlers.UpdateProjectUserHandler(db)).Methods("PUT")    // Aktualizacja ProjectUser
-	r.HandleFunc("/project-users/{id:[0-9]+}", handlers.DeleteProjectUserHandler(db)).Methods("DELETE") // Usuwanie ProjectUser
+	r.HandleFunc("/project-users/{id:[0-9]+}/", handlers.UpdateProjectUserHandler(db)).Methods("PUT")    // Aktualizacja ProjectUser
+	r.HandleFunc("/project-users/{id:[0-9]+}/", handlers.DeleteProjectUserHandler(db)).Methods("DELETE") // Usuwanie ProjectUser
 
-	r.HandleFunc("/task-comments/{id:[0-9]+}", handlers.UpdateTaskCommentHandler(db)).Methods("PUT")    // Aktualizacja TaskComment
-	r.HandleFunc("/task-comments/{id:[0-9]+}", handlers.DeleteTaskCommentHandler(db)).Methods("DELETE") // Usuwanie TaskComment
+	r.HandleFunc("/task-comments/{id:[0-9]+}/", handlers.UpdateTaskCommentHandler(db)).Methods("PUT")    // Aktualizacja TaskComment
+	r.HandleFunc("/task-comments/{id:[0-9]+}/", handlers.DeleteTaskCommentHandler(db)).Methods("DELETE") // Usuwanie TaskComment
+
+	// Protected routes
+	protected := r.PathPrefix("/api").Subrouter()
+	protected.Use(middleware.JWTMiddleware)
+
+	protected.HandleFunc("/users/delete/", handlers.DeleteOwnAccountHandler(db)).Methods("DELETE") // Usuwanie własnego konta
 
 	return r
 }

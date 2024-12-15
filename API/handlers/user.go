@@ -173,16 +173,40 @@ func DeleteUserHandler(db *sql.DB) http.HandlerFunc {
 func RegisterUserHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user User
+
+		// Dekodowanie JSON
 		err := json.NewDecoder(r.Body).Decode(&user)
 		if err != nil {
 			http.Error(w, "Invalid input", http.StatusBadRequest)
 			return
 		}
 
-		// Hashowanie hasła
-		hashedPassword := utils.HashPassword(user.PasswordHash)
+		// Sprawdzenie wymaganych pól
+		if user.Email == "" || user.Username == "" || user.PasswordHash == "" {
+			http.Error(w, "Missing required fields", http.StatusBadRequest)
+			return
+		}
 
-		// Wstaw użytkownika do bazy danych
+		// Sprawdzenie unikalności e-mail i username
+		var exists bool
+		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM Users WHERE email = ? OR username = ?)", user.Email, user.Username).Scan(&exists)
+		if err != nil {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+		if exists {
+			http.Error(w, "Email or username already exists", http.StatusConflict)
+			return
+		}
+
+		// Hashowanie hasła za pomocą Bcrypt
+		hashedPassword, err := utils.HashPassword(user.PasswordHash)
+		if err != nil {
+			http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+			return
+		}
+
+		// Wstawienie użytkownika do bazy danych
 		_, err = db.Exec("INSERT INTO Users (email, username, first_name, last_name, password_hash) VALUES (?, ?, ?, ?, ?)",
 			user.Email, user.Username, user.FirstName, user.LastName, hashedPassword)
 		if err != nil {
@@ -190,16 +214,18 @@ func RegisterUserHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Przygotowanie odpowiedzi
+		// Sukces
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{"message": "User registered successfully"})
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "User registered successfully",
+		})
 	}
 }
 
 func LoginUserHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var credentials struct {
-			Identifier string `json:"identifier"` // Can be email or username
+			Identifier string `json:"identifier"` // Może być email lub username
 			Password   string `json:"password"`
 		}
 
@@ -209,14 +235,15 @@ func LoginUserHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Query the database for either email or username
+		// Pobierz hash hasła oraz ID użytkownika z bazy danych
 		var storedHash string
+		var userID int
 		err = db.QueryRow(`
-			SELECT password_hash 
+			SELECT user_id, password_hash 
 			FROM Users 
 			WHERE email = ? OR username = ?`,
 			credentials.Identifier, credentials.Identifier,
-		).Scan(&storedHash)
+		).Scan(&userID, &storedHash)
 
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -227,14 +254,70 @@ func LoginUserHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Compare the password hash
-		if utils.HashPassword(credentials.Password) != storedHash {
+		// Porównaj hasło za pomocą Bcrypt
+		if err := utils.ComparePassword(storedHash, credentials.Password); err != nil {
 			http.Error(w, "Invalid email/username or password", http.StatusUnauthorized)
 			return
 		}
 
-		// Login successful
+		// Generowanie tokena JWT
+		token, err := utils.GenerateToken(userID)
+		if err != nil {
+			http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+			return
+		}
+
+		// Zwróć token w odpowiedzi
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "Login successful",
+			"token":   token,
+		})
+	}
+}
+
+func DeleteOwnAccountHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Pobierz token JWT z nagłówka Authorization
+		tokenString := r.Header.Get("Authorization")
+		if tokenString == "" {
+			http.Error(w, "Authorization header required", http.StatusUnauthorized)
+			return
+		}
+
+		// Walidacja tokena
+		claims, err := utils.ValidateToken(tokenString)
+		if err != nil {
+			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+
+		// Pobierz user_id z tokena JWT
+		userIDFloat, ok := claims["user_id"].(float64)
+		if !ok {
+			http.Error(w, "Invalid token data", http.StatusUnauthorized)
+			return
+		}
+		userID := int(userIDFloat)
+
+		// Usuń konto z bazy danych
+		result, err := db.Exec("DELETE FROM Users WHERE user_id = ?", userID)
+		if err != nil {
+			http.Error(w, "Failed to delete account", http.StatusInternalServerError)
+			return
+		}
+
+		// Sprawdź, czy użytkownik został usunięty
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected == 0 {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		}
+
+		// Zwrot odpowiedzi
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Login successful"})
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "Account deleted successfully",
+		})
 	}
 }
