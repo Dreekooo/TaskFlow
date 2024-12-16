@@ -39,8 +39,11 @@ API/
 │   ├── drawSQL-image-ex/         # ERD diagram examples
 │   ├── drawSQL-mysql-ex/         # SQL scripts or schemas
 ├── handlers/                     # Handlers for various endpoints
+│   ├── priority.go
 │   ├── project.go
 │   ├── project_users.go
+│   ├── roles.go
+│   ├── status.go
 │   ├── task.go
 │   ├── task_comments.go
 │   ├── user.go
@@ -176,6 +179,33 @@ A pre-filled SQLite test database is included in the repository: **`test-files/t
 - `GET /project-users/{id}/` - Get project user by ID
 - `PUT /project-users/{id}/` - Update project user
 - `DELETE /project-users/{id}/` - Delete project user
+
+---
+
+### **Roles**
+- `POST /roles/` - Create a new role
+- `GET /roles/` - Get all roles
+- `GET /roles/{id}/` - Get role by ID
+- `PUT /roles/{id}/` - Update role by ID
+- `DELETE /roles/{id}/` - Delete role by ID
+
+---
+
+### **Priorities**
+- `POST /priorities/` - Create a new priority
+- `GET /priorities/` - Get all priorities
+- `GET /priorities/{id}/` - Get priority by ID
+- `PUT /priorities/{id}/` - Update priority by ID
+- `DELETE /priorities/{id}/` - Delete priority by ID
+
+---
+
+### **Status**
+- `POST /statuses/` - Create a new status
+- `GET /statuses/` - Get all statuses
+- `GET /statuses/{id}/` - Get status by ID
+- `PUT /statuses/{id}/` - Update status by ID
+- `DELETE /statuses/{id}/` - Delete status by ID
 
 ---
 

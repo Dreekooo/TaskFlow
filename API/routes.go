@@ -47,6 +47,27 @@ func SetupRoutes(db *sql.DB) *mux.Router {
 	r.HandleFunc("/task-comments/{id:[0-9]+}/", handlers.UpdateTaskCommentHandler(db)).Methods("PUT")    // Aktualizacja TaskComment
 	r.HandleFunc("/task-comments/{id:[0-9]+}/", handlers.DeleteTaskCommentHandler(db)).Methods("DELETE") // Usuwanie TaskComment
 
+	// Role routes
+	r.HandleFunc("/roles/", handlers.CreateRoleHandler(db)).Methods("POST")               // Add a new role
+	r.HandleFunc("/roles/", handlers.GetRolesHandler(db)).Methods("GET")                  // Get all roles
+	r.HandleFunc("/roles/{id:[0-9]+}/", handlers.GetRoleByIDHandler(db)).Methods("GET")   // Get role by ID
+	r.HandleFunc("/roles/{id:[0-9]+}/", handlers.UpdateRoleHandler(db)).Methods("PUT")    // Update role by ID
+	r.HandleFunc("/roles/{id:[0-9]+}/", handlers.DeleteRoleHandler(db)).Methods("DELETE") // Delete role by ID
+
+	// Priority routes
+	r.HandleFunc("/priorities/", handlers.CreatePriorityHandler(db)).Methods("POST")               // Add a new priority
+	r.HandleFunc("/priorities/", handlers.GetPrioritiesHandler(db)).Methods("GET")                 // Get all priorities
+	r.HandleFunc("/priorities/{id:[0-9]+}/", handlers.GetPriorityByIDHandler(db)).Methods("GET")   // Get priority by ID
+	r.HandleFunc("/priorities/{id:[0-9]+}/", handlers.UpdatePriorityHandler(db)).Methods("PUT")    // Update priority by ID
+	r.HandleFunc("/priorities/{id:[0-9]+}/", handlers.DeletePriorityHandler(db)).Methods("DELETE") // Delete priority by ID
+
+	// Status routes
+	r.HandleFunc("/statuses/", handlers.CreateStatusHandler(db)).Methods("POST")               // Add a new status
+	r.HandleFunc("/statuses/", handlers.GetStatusesHandler(db)).Methods("GET")                 // Get all statuses
+	r.HandleFunc("/statuses/{id:[0-9]+}/", handlers.GetStatusByIDHandler(db)).Methods("GET")   // Get status by ID
+	r.HandleFunc("/statuses/{id:[0-9]+}/", handlers.UpdateStatusHandler(db)).Methods("PUT")    // Update status by ID
+	r.HandleFunc("/statuses/{id:[0-9]+}/", handlers.DeleteStatusHandler(db)).Methods("DELETE") // Delete status by ID
+
 	// Protected routes
 	protected := r.PathPrefix("/api").Subrouter()
 	protected.Use(middleware.JWTMiddleware)
