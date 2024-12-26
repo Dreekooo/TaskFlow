@@ -136,6 +136,7 @@ class ProjectsAPIViewModel : ViewModel() {
                     Log.e("API_ERROR", "Error adding project: ${response.message()}")
                 }
             }
+
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 Log.e("API_EXCEPTION", "Exception: $t")
             }

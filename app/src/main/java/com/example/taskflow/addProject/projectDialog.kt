@@ -73,7 +73,7 @@ fun AddProjectDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(56.dp)
+                    .padding(start = 40.dp, end = 40.dp)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Task,
@@ -94,9 +94,12 @@ fun AddProjectDialog(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = backgroundDialog
-                    )
+                    ),
                 ) {
-                    Column(modifier = Modifier.padding(top = 25.dp, bottom = 15.dp)) {
+                    Column(
+                        modifier = Modifier.padding(top = 15.dp, bottom = 15.dp),
+                    ) {
+                        Spacer(modifier = Modifier.padding(5.dp))
                         ProjectName(projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         projectDescription(projectsViewModel)
@@ -154,7 +157,9 @@ fun ProjectName(
             focusedBorderColor = textEdit,
             unfocusedBorderColor = textEdit,
             focusedContainerColor = textEdit,
-            unfocusedContainerColor = textEdit
+            unfocusedContainerColor = textEdit,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor
         )
     )
 }
@@ -211,6 +216,8 @@ fun projectDescription(projectsViewModel: ProjectViewModel) {
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor
             )
         )
     }
@@ -256,7 +263,9 @@ fun RoleName(
             focusedBorderColor = textEdit,
             unfocusedBorderColor = textEdit,
             focusedContainerColor = textEdit,
-            unfocusedContainerColor = textEdit
+            unfocusedContainerColor = textEdit,
+            focusedTextColor = textColor,
+            unfocusedTextColor = textColor
         )
     )
 }
