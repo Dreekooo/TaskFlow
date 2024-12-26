@@ -28,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -272,10 +275,12 @@ fun RoleName(
 fun AllRoles(viewModel: ProjectsAPIViewModel) {
     val roles = viewModel.roles.collectAsState().value
     val selectedRoles by viewModel.selectedRoles.collectAsState()
+    val columnHeight = if (roles.size >= 2) 100.dp else Dp.Unspecified
+
 
     LazyColumn(
         modifier = Modifier
-            .height(150.dp)
+            .height(columnHeight)
             .fillMaxWidth()
             .padding(start = 20.dp)
     ) {
@@ -297,7 +302,8 @@ fun AllRoles(viewModel: ProjectsAPIViewModel) {
 @Composable
 fun AllUsers(apiViewModel: ProjectsAPIViewModel) {
     val users = apiViewModel.allUsers.collectAsState().value
-    val selectedUsers by apiViewModel.selectedUsers.collectAsState() // Zmienna dla zaznaczonych użytkowników
+    val selectedUsers by apiViewModel.selectedUsers.collectAsState()
+    val columnHeight = if (users.size >= 2) 100.dp else Dp.Unspecified
 
     Text(
         text = "Add users to project:",
@@ -307,7 +313,11 @@ fun AllUsers(apiViewModel: ProjectsAPIViewModel) {
         fontFamily = FontFamily(Font(R.font.font))
     )
 
-    LazyColumn(modifier = Modifier.padding(start = 15.dp, top = 5.dp)) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(start = 15.dp, top = 5.dp)
+            .height(columnHeight)
+    ) {
         items(users) { user ->
             CustomRadioButton(
                 title = user.username,
@@ -318,8 +328,6 @@ fun AllUsers(apiViewModel: ProjectsAPIViewModel) {
                     apiViewModel.onSelectionChanged(selectedUserId)
                 }
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
