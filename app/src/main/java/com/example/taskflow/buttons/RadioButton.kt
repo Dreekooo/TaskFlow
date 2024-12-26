@@ -1,5 +1,6 @@
 package com.example.taskflow.buttons
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -19,9 +20,11 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.taskflow.R
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
+import com.example.taskflow.ui.theme.backgroundDialog
 import com.example.taskflow.ui.theme.iconColor
 import com.example.taskflow.ui.theme.radioButton
 import com.example.taskflow.ui.theme.textColor
@@ -29,43 +32,35 @@ import com.example.taskflow.ui.theme.textColor
 @Composable
 fun CustomRadioButton(
     title: String,
-    userId: Int,
+    id: Int,
     color: Color,
-    viewModel: ProjectViewModel,
-    selectedValues: List<Int>,
-    onSelectionChanged: (Int) -> Unit,
+    isSelected: Boolean,
+    onSelectionChanged: (Int) -> Unit
 ) {
-    val isChecked = userId in selectedValues
 
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable {
-            onSelectionChanged(userId)
-            viewModel.enabled = !viewModel.enabled
-        }
+        modifier = Modifier.clickable { onSelectionChanged(id) }
     ) {
         IconToggleButton(
-            checked = isChecked,
-            onCheckedChange = {
-                onSelectionChanged(userId)
-            }
+            checked = isSelected,
+            onCheckedChange = { onSelectionChanged(id) }
         ) {
             Icon(
-                imageVector = if (isChecked) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
+                imageVector = if (isSelected) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = "Radio button icon",
-                tint = color,
+                tint = radioButton,
                 modifier = Modifier.size(30.dp)
             )
 
-            if (isChecked) {
+            if (isSelected) {
                 Icon(
                     imageVector = Icons.Rounded.Check,
                     contentDescription = "Selected checkmark",
                     tint = iconColor,
                     modifier = Modifier.size(18.dp)
                 )
-                viewModel.enabled = true
             }
         }
 
@@ -73,10 +68,9 @@ fun CustomRadioButton(
             text = title,
             color = textColor,
             fontSize = 18.sp,
-            fontFamily = FontFamily(
-                Font(R.font.font)
-            ),
+            fontFamily = FontFamily(Font(R.font.font))
         )
     }
 }
+
 

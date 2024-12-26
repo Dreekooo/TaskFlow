@@ -45,12 +45,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import com.example.taskflow.R
+import com.example.taskflow.buttons.AddRoleButton
 import com.example.taskflow.buttons.CloseButton
 import com.example.taskflow.buttons.CustomRadioButton
 import com.example.taskflow.buttons.SubmitButton
 import com.example.taskflow.ui.theme.backgroundDialog
 import com.example.taskflow.ui.theme.iconColor
-import com.example.taskflow.ui.theme.placeholder
 import com.example.taskflow.ui.theme.radioButton
 import com.example.taskflow.ui.theme.textColor
 import com.example.taskflow.ui.theme.textEdit
@@ -58,15 +58,13 @@ import com.example.taskflow.ui.theme.textEdit
 
 @Composable
 fun AddProjectDialog(
-    projectsViewModel: ProjectViewModel,
-    apiViewModel: ProjectsAPIViewModel
+    projectsViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
 ) {
     if (projectsViewModel.isDialogShow) {
         Dialog(
             onDismissRequest = {
                 projectsViewModel.onDismissRequest()
-            },
-            properties = DialogProperties(
+            }, properties = DialogProperties(
                 usePlatformDefaultWidth = false
             )
         ) {
@@ -104,9 +102,13 @@ fun AddProjectDialog(
                         Spacer(modifier = Modifier.padding(5.dp))
                         projectDescription(projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        RoleName(projectsViewModel = projectsViewModel)
+                        RoleName(projectsViewModel = projectsViewModel, apiViewModel = apiViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        AllUsers(apiViewModel = apiViewModel, projectsViewModel = projectsViewModel)
+                        AllRoles(
+                            apiViewModel
+                        )
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        AllUsers(apiViewModel = apiViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         ButtonsProjects(viewModel = projectsViewModel, apiViewModel)
                     }
@@ -142,16 +144,12 @@ fun ProjectName(
             .padding(start = 17.dp, end = 25.dp)
             .clip(RoundedCornerShape(10.dp))
             .border(
-                width = 2.dp,
-                color = textEdit,
-                shape = RoundedCornerShape(10.dp)
+                width = 2.dp, color = textEdit, shape = RoundedCornerShape(10.dp)
             ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done
         ),
-        keyboardActions = KeyboardActions(
-            onDone = { keyboardController?.hide() }
-        ),
+        keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
         shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = textEdit,
@@ -197,8 +195,7 @@ fun projectDescription(projectsViewModel: ProjectViewModel) {
             value = projectsViewModel.projectDescription,
             onValueChange = { projectsViewModel.projectDescription = it },
             textStyle = TextStyle(
-                textAlign = TextAlign.Start,
-                fontSize = 14.sp
+                textAlign = TextAlign.Start, fontSize = 14.sp
             ),
             modifier = Modifier
                 .size(500.dp, 250.dp)
@@ -209,9 +206,7 @@ fun projectDescription(projectsViewModel: ProjectViewModel) {
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done
             ),
-            keyboardActions = KeyboardActions(
-                onDone = { keyboardController?.hide() }
-            ),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
@@ -225,7 +220,7 @@ fun projectDescription(projectsViewModel: ProjectViewModel) {
 
 @Composable
 fun RoleName(
-    projectsViewModel: ProjectViewModel
+    projectsViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Text(
@@ -237,68 +232,90 @@ fun RoleName(
             Font(R.font.font)
         )
     )
-    OutlinedTextField(
-        value = projectsViewModel.roleName,
-        onValueChange = {
-            projectsViewModel.roleName = it
-        },
-        textStyle = TextStyle(textAlign = TextAlign.Justify),
-        modifier = Modifier
-            .size(500.dp, 50.dp)
-            .padding(start = 17.dp, end = 25.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .border(
-                width = 2.dp,
-                color = textEdit,
-                shape = RoundedCornerShape(10.dp)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(end = 5.dp)
+    ) {
+        OutlinedTextField(
+            value = projectsViewModel.roleName,
+            onValueChange = {
+                projectsViewModel.roleName = it
+            },
+            textStyle = TextStyle(textAlign = TextAlign.Justify),
+            modifier = Modifier
+                .size(280.dp, 50.dp)
+                .padding(start = 17.dp, end = 5.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .border(
+                    width = 2.dp, color = textEdit, shape = RoundedCornerShape(10.dp)
+                ),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
             ),
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { keyboardController?.hide() }
-        ),
-        shape = RoundedCornerShape(10.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = textEdit,
-            unfocusedBorderColor = textEdit,
-            focusedContainerColor = textEdit,
-            unfocusedContainerColor = textEdit,
-            focusedTextColor = textColor,
-            unfocusedTextColor = textColor
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+            shape = RoundedCornerShape(10.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = textEdit,
+                unfocusedBorderColor = textEdit,
+                focusedContainerColor = textEdit,
+                unfocusedContainerColor = textEdit,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor
+            )
         )
-    )
+        AddRoleButton(apiViewModel = apiViewModel, viewModel = projectsViewModel)
+    }
+}
+
+@Composable
+fun AllRoles(viewModel: ProjectsAPIViewModel) {
+    val roles = viewModel.roles.collectAsState().value
+    val selectedRoles by viewModel.selectedRoles.collectAsState()
+
+    LazyColumn(
+        modifier = Modifier
+            .height(150.dp)
+            .fillMaxWidth()
+            .padding(start = 20.dp)
+    ) {
+        items(roles) { role ->
+            CustomRadioButton(
+                title = role.role_name,
+                id = role.id,
+                color = radioButton,
+                isSelected = selectedRoles.contains(role.id),
+                onSelectionChanged = { selectedRoleId ->
+                    viewModel.onRoleSelectionChanged(selectedRoleId)
+                }
+            )
+        }
+    }
 }
 
 
 @Composable
-fun AllUsers(
-    apiViewModel: ProjectsAPIViewModel,
-    projectsViewModel: ProjectViewModel
-) {
-
+fun AllUsers(apiViewModel: ProjectsAPIViewModel) {
     val users = apiViewModel.allUsers.collectAsState().value
-    val selectedUsers by apiViewModel.selectedUsers.collectAsState()
+    val selectedUsers by apiViewModel.selectedUsers.collectAsState() // Zmienna dla zaznaczonych użytkowników
+
     Text(
-        text = "add users to project:",
+        text = "Add users to project:",
         textAlign = TextAlign.Left,
         modifier = Modifier.padding(top = 5.dp, start = 20.dp, bottom = 4.dp),
         color = textColor,
-        fontFamily = FontFamily(
-            Font(R.font.font)
-        )
+        fontFamily = FontFamily(Font(R.font.font))
     )
 
     LazyColumn(modifier = Modifier.padding(start = 15.dp, top = 5.dp)) {
         items(users) { user ->
             CustomRadioButton(
                 title = user.username,
+                id = user.id,
                 color = radioButton,
-                userId = user.id,
-                viewModel = projectsViewModel,
-                selectedValues = selectedUsers,
-                onSelectionChanged = { selectedUser ->
-                    apiViewModel.onSelectionChanged(selectedUser)
+                isSelected = selectedUsers.contains(user.id),
+                onSelectionChanged = { selectedUserId ->
+                    apiViewModel.onSelectionChanged(selectedUserId)
                 }
             )
 
@@ -306,6 +323,7 @@ fun AllUsers(
         }
     }
 }
+
 
 @Composable
 fun ButtonsProjects(viewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel) {

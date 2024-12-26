@@ -1,7 +1,6 @@
 package com.example.taskflow.addProject.projectUsers
 
 import retrofit2.Call
-import com.example.taskflow.addProject.Project
 import com.example.taskflow.addProject.ProjectPost
 import retrofit2.http.Body
 import retrofit2.http.POST

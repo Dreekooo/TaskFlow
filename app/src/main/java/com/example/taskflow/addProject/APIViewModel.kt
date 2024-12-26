@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskflow.addProject.projectUsers.POSTUsersInterface
-import com.example.taskflow.addProject.projectUsers.ProjectUser
 import com.example.taskflow.addProject.projectUsers.ProjectUserPOST
+import com.example.taskflow.addProject.role.Role
+import com.example.taskflow.addProject.role.RoleInterface
+import com.example.taskflow.addProject.role.RolePost
 import com.example.taskflow.addProject.users.User
 import com.example.taskflow.addProject.users.UserInterface
 import kotlinx.coroutines.Dispatchers
@@ -26,14 +28,11 @@ class ProjectsAPIViewModel : ViewModel() {
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
-    private val _allUsers =
-        MutableStateFlow<List<User>>(emptyList())
+    private val _allUsers = MutableStateFlow<List<User>>(emptyList())
     val allUsers: StateFlow<List<User>> = _allUsers
 
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.68.106:8080/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    private val retrofit: Retrofit = Retrofit.Builder().baseUrl("http://192.168.68.106:8080/")
+        .addConverterFactory(GsonConverterFactory.create()).build()
 
     private val api: ProjectInterface = retrofit.create(ProjectInterface::class.java)
     private val userApi: UserInterface = retrofit.create(UserInterface::class.java)
@@ -43,6 +42,7 @@ class ProjectsAPIViewModel : ViewModel() {
         fetchProjects()
         fetchAllUsers(1)
         startAutoRefresh()
+        getAllRole()
     }
 
     private fun fetchProjects() {
@@ -70,6 +70,7 @@ class ProjectsAPIViewModel : ViewModel() {
                     fetchProjects()
                     fetchAllUsers(1)
                     delay(1000)
+                    getAllRole()
                 } catch (e: Exception) {
                     Log.e("AUTO_REFRESH_ERROR", "Error during auto-refresh", e)
                 }
@@ -78,8 +79,7 @@ class ProjectsAPIViewModel : ViewModel() {
     }
 
     private inline fun <T> fetchData(
-        crossinline apiCall: suspend () -> T,
-        crossinline onSuccess: (T) -> Unit
+        crossinline apiCall: suspend () -> T, crossinline onSuccess: (T) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -92,20 +92,6 @@ class ProjectsAPIViewModel : ViewModel() {
         }
     }
 
-    private val _selectedUsers = MutableStateFlow<List<Int>>(emptyList())
-    val selectedUsers: StateFlow<List<Int>> = _selectedUsers
-
-    fun onSelectionChanged(userId: Int) {
-        _selectedUsers.value = if (_selectedUsers.value.contains(userId)) {
-            _selectedUsers.value - userId
-        } else {
-            if (_selectedUsers.value.size < 2) {
-                _selectedUsers.value + userId
-            } else {
-                _selectedUsers.value.drop(1) + userId
-            }
-        }
-    }
 
     fun addProjectUser(projectId: Int, userId: Int, role: Int) {
         val projectUser = ProjectUserPOST(projectId, userId, role)
@@ -141,6 +127,71 @@ class ProjectsAPIViewModel : ViewModel() {
                 Log.e("API_EXCEPTION", "Exception: $t")
             }
         })
+    }
+
+    fun addRole(name: String) {
+        val role = RolePost(name)
+        val roleApi = retrofit.create(RoleInterface::class.java)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = roleApi.addRole(role)
+                response.enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            Log.d("API_SUCCESS", "Role added successfully!")
+                        } else {
+                            Log.e("API_ERROR", "Error adding role: ${response.message()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        Log.e("API_EXCEPTION", "Exception: $t")
+                    }
+                })
+            } catch (e: Exception) {
+                Log.e("ADD_ROLE_ERROR", "Error adding role", e)
+            }
+        }
+    }
+
+    private val _roles = MutableStateFlow<List<Role>>(emptyList())
+    val roles: StateFlow<List<Role>> = _roles
+
+    fun getAllRole() {
+        val roleApi = retrofit.create(RoleInterface::class.java)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val roles = roleApi.getRole()
+                _roles.value = roles
+                Log.d("API_SUCCESS", "Roles fetched successfully: $roles")
+            } catch (e: Exception) {
+                Log.e("API_ERROR", "Error fetching roles", e)
+            }
+        }
+    }
+
+    private val _selectedRoles = MutableStateFlow<List<Int>>(emptyList())
+    val selectedRoles: StateFlow<List<Int>> = _selectedRoles
+
+    fun onRoleSelectionChanged(roleId: Int) {
+        _selectedRoles.value = if (_selectedRoles.value.contains(roleId)) {
+            _selectedRoles.value - roleId
+        } else {
+            _selectedRoles.value + roleId
+        }
+    }
+
+    private val _selectedUsers = MutableStateFlow<List<Int>>(emptyList())
+    val selectedUsers: StateFlow<List<Int>> = _selectedUsers
+
+    fun onSelectionChanged(userId: Int) {
+        _selectedUsers.value = if (_selectedUsers.value.contains(userId)) {
+            _selectedUsers.value - userId
+        } else {
+            _selectedUsers.value + userId
+        }
     }
 
 

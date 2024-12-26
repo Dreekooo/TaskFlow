@@ -2,10 +2,13 @@ package com.example.taskflow.buttons
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.PersonAdd
+import androidx.compose.material.icons.rounded.PersonAddAlt1
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -85,4 +88,27 @@ fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectVi
         1
     )
     projectViewModel.onDismissRequest()
+}
+
+@Composable
+fun AddRoleButton(
+    apiViewModel: ProjectsAPIViewModel,
+    viewModel: ProjectViewModel
+) {
+    FloatingActionButton(
+        onClick = {
+            apiViewModel.addRole(viewModel.roleName)
+            viewModel.roleName = ""
+        },
+        modifier = Modifier.size(50.dp),
+        shape = RoundedCornerShape(10.dp),
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.PersonAddAlt1,
+            contentDescription = stringResource(R.string.plus_content),
+            modifier = Modifier.size(34.dp)
+        )
+    }
 }
