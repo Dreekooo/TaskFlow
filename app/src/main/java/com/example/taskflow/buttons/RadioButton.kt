@@ -16,8 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -35,7 +39,9 @@ fun CustomRadioButton(
     id: Int,
     color: Color,
     isSelected: Boolean,
-    onSelectionChanged: (Int) -> Unit
+    onSelectionChanged: (Int) -> Unit,
+    iconSize: Dp,
+    textSize: Dp
 ) {
 
     Row(
@@ -51,7 +57,7 @@ fun CustomRadioButton(
                 imageVector = if (isSelected) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = "Radio button icon",
                 tint = radioButton,
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(iconSize)
             )
 
             if (isSelected) {
@@ -59,7 +65,7 @@ fun CustomRadioButton(
                     imageVector = Icons.Rounded.Check,
                     contentDescription = "Selected checkmark",
                     tint = iconColor,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(iconSize / 2)
                 )
             }
         }
@@ -67,10 +73,15 @@ fun CustomRadioButton(
         Text(
             text = title,
             color = textColor,
-            fontSize = 18.sp,
+            fontSize = dpToSp(textSize),
             fontFamily = FontFamily(Font(R.font.font))
         )
     }
 }
 
+@Composable
+fun dpToSp(dp: Dp): TextUnit {
+    val density = LocalDensity.current
+    return with(density) { dp.toSp() }
+}
 

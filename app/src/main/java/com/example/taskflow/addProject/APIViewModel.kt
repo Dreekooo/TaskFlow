@@ -195,4 +195,23 @@ class ProjectsAPIViewModel : ViewModel() {
     }
 
 
+    private val _userRoles = MutableStateFlow<Map<Int, Set<Int>>>(emptyMap())
+    val userRoles: StateFlow<Map<Int, Set<Int>>> = _userRoles
+
+    fun onUserRoleSelectionChanged(userId: Int, roleId: Int) {
+        _userRoles.value = _userRoles.value.toMutableMap().apply {
+            val rolesForUser = this[userId]?.toMutableSet() ?: mutableSetOf()
+            if (rolesForUser.contains(roleId)) {
+                rolesForUser.remove(roleId)
+                Log.d("USER_ROLE", "User $userId: Role $roleId removed")
+            } else {
+                rolesForUser.add(roleId)
+                Log.d("USER_ROLE", "User $userId: Role $roleId added")
+            }
+            this[userId] = rolesForUser
+        }
+    }
+
+
+
 }

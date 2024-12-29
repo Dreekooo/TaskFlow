@@ -1,5 +1,10 @@
 package com.example.taskflow.addProject
 
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -7,11 +12,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -105,13 +113,7 @@ fun AddProjectDialog(
                         Spacer(modifier = Modifier.padding(5.dp))
                         projectDescription(projectsViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        RoleName(projectsViewModel = projectsViewModel, apiViewModel = apiViewModel)
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        AllRoles(
-                            apiViewModel
-                        )
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        AllUsers(apiViewModel = apiViewModel)
+                        AllUsers(viewModel = apiViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         ButtonsProjects(viewModel = projectsViewModel, apiViewModel)
                     }
@@ -272,27 +274,27 @@ fun RoleName(
 }
 
 @Composable
-fun AllRoles(viewModel: ProjectsAPIViewModel) {
+fun AllRolesForUser(userId: Int, viewModel: ProjectsAPIViewModel) {
     val roles = viewModel.roles.collectAsState().value
-    val selectedRoles by viewModel.selectedRoles.collectAsState()
-    val columnHeight = if (roles.size >= 2) 100.dp else Dp.Unspecified
+    val userRoles by viewModel.userRoles.collectAsState()
 
-
-    LazyColumn(
+    LazyRow(
         modifier = Modifier
-            .height(columnHeight)
+            .padding(start = 20.dp, top = 5.dp)
             .fillMaxWidth()
-            .padding(start = 20.dp)
     ) {
         items(roles) { role ->
+            val isSelected = userRoles[userId]?.contains(role.id) == true
             CustomRadioButton(
                 title = role.role_name,
                 id = role.id,
                 color = radioButton,
-                isSelected = selectedRoles.contains(role.id),
+                isSelected = isSelected,
                 onSelectionChanged = { selectedRoleId ->
-                    viewModel.onRoleSelectionChanged(selectedRoleId)
-                }
+                    viewModel.onUserRoleSelectionChanged(userId, selectedRoleId)
+                },
+                textSize = 12.dp,
+                iconSize = 20.dp
             )
         }
     }
@@ -300,34 +302,51 @@ fun AllRoles(viewModel: ProjectsAPIViewModel) {
 
 
 @Composable
-fun AllUsers(apiViewModel: ProjectsAPIViewModel) {
-    val users = apiViewModel.allUsers.collectAsState().value
-    val selectedUsers by apiViewModel.selectedUsers.collectAsState()
-    val columnHeight = if (users.size >= 2) 100.dp else Dp.Unspecified
+fun AllUsers(viewModel: ProjectsAPIViewModel) {
+    val users = viewModel.allUsers.collectAsState().value
+    val selectedUsers by viewModel.selectedUsers.collectAsState()
 
-    Text(
-        text = "Add users to project:",
-        textAlign = TextAlign.Left,
-        modifier = Modifier.padding(top = 5.dp, start = 20.dp, bottom = 4.dp),
-        color = textColor,
-        fontFamily = FontFamily(Font(R.font.font))
+    val columnHeight by animateDpAsState(
+        targetValue = if (selectedUsers.isNotEmpty()) 300.dp else 100.dp,
+        animationSpec = tween(
+            durationMillis = 200,
+            easing = FastOutLinearInEasing
+        )
     )
 
     LazyColumn(
         modifier = Modifier
             .padding(start = 15.dp, top = 5.dp)
+            .heightIn(min = 100.dp, max = 200.dp)
             .height(columnHeight)
+            .fillMaxWidth()
     ) {
         items(users) { user ->
-            CustomRadioButton(
-                title = user.username,
-                id = user.id,
-                color = radioButton,
-                isSelected = selectedUsers.contains(user.id),
-                onSelectionChanged = { selectedUserId ->
-                    apiViewModel.onSelectionChanged(selectedUserId)
+            Column(modifier = Modifier.padding(bottom = 10.dp)) {
+                CustomRadioButton(
+                    title = user.username,
+                    id = user.id,
+                    color = radioButton,
+                    isSelected = selectedUsers.contains(user.id),
+                    onSelectionChanged = { selectedUserId ->
+                        viewModel.onSelectionChanged(selectedUserId)
+                    },
+                    textSize = 18.dp,
+                    iconSize = 30.dp
+                )
+
+                if (selectedUsers.contains(user.id)) {
+                    Text(
+                        text = "Assign roles:",
+                        modifier = Modifier.padding(start = 20.dp, top = 5.dp),
+                        color = textColor,
+                        fontFamily = FontFamily(Font(R.font.font)),
+                        fontSize = 12.sp
+                    )
+
+                    AllRolesForUser(userId = user.id, viewModel = viewModel)
                 }
-            )
+            }
         }
     }
 }
