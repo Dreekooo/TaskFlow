@@ -82,10 +82,11 @@ fun AddProjectButton(
 }
 
 fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
-    apiViewModel.addProject(
+    apiViewModel.addProjectRoles(
         projectViewModel.projectName,
         projectViewModel.projectDescription,
-        1
+        1,
+        apiViewModel.userRoles.value
     )
     projectViewModel.onDismissRequest()
 }

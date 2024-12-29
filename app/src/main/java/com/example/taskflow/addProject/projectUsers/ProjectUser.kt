@@ -15,3 +15,10 @@ data class ProjectUserPOST(
     @SerializedName("user_id") val userId: Int,
     @SerializedName("role") val role: Int
 )
+
+data class ProjectResponse(
+    @SerializedName("id") val id: Int,
+    @SerializedName("name") val name: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("created_by") val createdBy: Int
+)

@@ -98,36 +98,75 @@ class ProjectsAPIViewModel : ViewModel() {
 
         val projectUserApi = retrofit.create(POSTUsersInterface::class.java)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = projectUserApi.addProjectUser(projectUser)
-            } catch (e: Exception) {
-                Log.e("API_EXCEPTION", "Exception: $e")
+        projectUserApi.addProjectUser(projectUser).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d(
+                        "API_SUCCESS",
+                        "User $userId assigned to project $projectId with role $role"
+                    )
+                } else {
+                    Log.e("API_ERROR", "Error assigning user to project: ${response.message()}")
+                }
             }
-        }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("API_EXCEPTION", "Failed to assign user to project: $t")
+            }
+        })
     }
 
 
-    fun addProject(name: String, description: String, createdBy: Int) {
-        val project = ProjectPost(name, description, createdBy)
+    fun addProjectRoles(
+        projectName: String,
+        projectDescription: String,
+        createdBy: Int,
+        userRoles: Map<Int, Set<Int>>
+    ) {
+        val project = ProjectPost(projectName, projectDescription, createdBy)
 
-        Log.d("dupa", "dupa")
         val projectApi = retrofit.create(POSTUsersInterface::class.java)
 
-        projectApi.addProject(project).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+        projectApi.addProject(project).enqueue(object : Callback<Response<Void>> {
+            override fun onResponse(
+                call: Call<Response<Void>>,
+                response: Response<Response<Void>>
+            ) {
                 if (response.isSuccessful) {
-                    Log.d("API_SUCCESS", "Project added successfully!")
+
+                    val projectWithMaxId: Project? = projects.value.maxByOrNull { it.id }
+
+                    Log.d("users", userRoles.size.toString())
+                    Log.d("API_SUCCESS", "Project created successfully!")
+
+                    userRoles.forEach { (userId, roleIds) ->
+                        roleIds.forEach { roleId ->
+                            if (projectWithMaxId != null) {
+                                addProjectUser(
+                                    projectWithMaxId.id,
+                                    userId,
+                                    roleId
+                                )
+                            } else {
+                                addProjectUser(
+                                    1,
+                                    userId,
+                                    roleId
+                                )
+                            }
+                        }
+                    }
                 } else {
                     Log.e("API_ERROR", "Error adding project: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.e("API_EXCEPTION", "Exception: $t")
+            override fun onFailure(call: Call<Response<Void>>, t: Throwable) {
+                Log.e("API_EXCEPTION", "Failed to create project: $t")
             }
         })
     }
+
 
     fun addRole(name: String) {
         val role = RolePost(name)
@@ -172,16 +211,6 @@ class ProjectsAPIViewModel : ViewModel() {
         }
     }
 
-    private val _selectedRoles = MutableStateFlow<List<Int>>(emptyList())
-    val selectedRoles: StateFlow<List<Int>> = _selectedRoles
-
-    fun onRoleSelectionChanged(roleId: Int) {
-        _selectedRoles.value = if (_selectedRoles.value.contains(roleId)) {
-            _selectedRoles.value - roleId
-        } else {
-            _selectedRoles.value + roleId
-        }
-    }
 
     private val _selectedUsers = MutableStateFlow<List<Int>>(emptyList())
     val selectedUsers: StateFlow<List<Int>> = _selectedUsers
@@ -194,24 +223,26 @@ class ProjectsAPIViewModel : ViewModel() {
         }
     }
 
-
     private val _userRoles = MutableStateFlow<Map<Int, Set<Int>>>(emptyMap())
     val userRoles: StateFlow<Map<Int, Set<Int>>> = _userRoles
 
     fun onUserRoleSelectionChanged(userId: Int, roleId: Int) {
         _userRoles.value = _userRoles.value.toMutableMap().apply {
             val rolesForUser = this[userId]?.toMutableSet() ?: mutableSetOf()
+
             if (rolesForUser.contains(roleId)) {
                 rolesForUser.remove(roleId)
                 Log.d("USER_ROLE", "User $userId: Role $roleId removed")
+                if (rolesForUser.isEmpty()) {
+                    this.remove(userId)
+                } else {
+                    this[userId] = rolesForUser
+                }
             } else {
                 rolesForUser.add(roleId)
                 Log.d("USER_ROLE", "User $userId: Role $roleId added")
+                this[userId] = rolesForUser
             }
-            this[userId] = rolesForUser
         }
     }
-
-
-
 }
