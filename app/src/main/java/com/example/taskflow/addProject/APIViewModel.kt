@@ -143,7 +143,7 @@ class ProjectsAPIViewModel : ViewModel() {
                         roleIds.forEach { roleId ->
                             if (projectWithMaxId != null) {
                                 addProjectUser(
-                                    projectWithMaxId.id,
+                                    projectWithMaxId.id + 1,
                                     userId,
                                     roleId
                                 )
