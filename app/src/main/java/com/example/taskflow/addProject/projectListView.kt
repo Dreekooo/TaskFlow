@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskflow.R
 import com.example.taskflow.buttons.AddProjectButton
+import com.example.taskflow.buttons.DeleteButton
+import com.example.taskflow.buttons.EditButton
+import com.example.taskflow.buttons.ProjectsTaskBtn
 
 @Composable
 fun ProjectList(
@@ -67,11 +70,13 @@ fun ProjectList(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             if (projects.isEmpty()) {
                 item { Text(text = "No projects available") }
             } else {
                 items(projects) { project ->
                     var userName by remember { mutableStateOf("") }
+                    var expandedProjectId by remember { mutableStateOf<Int?>(null) }
 
                     LaunchedEffect(project.created_by) {
                         apiViewModel.fetchUserById(project.created_by) { user ->
@@ -79,10 +84,17 @@ fun ProjectList(
                         }
                     }
 
-                    projectView(
+                    ProjectView(
+                        projectID = project.id,
                         projectName = project.name,
                         created_by = userName,
-                        colorResource(R.color.project_color)
+                        colorResource(R.color.project_color),
+                        isExpanded = expandedProjectId == project.id,
+                        onClick = {
+                            expandedProjectId =
+                                if (expandedProjectId == project.id) null else project.id
+                        },
+                        apiViewModel = apiViewModel,
                     )
 
                     Log.d(
@@ -105,10 +117,15 @@ fun ProjectList(
 }
 
 @Composable
-fun projectView(
-    projectName: String, created_by: String, color: Color
+fun ProjectView(
+    projectID: Int,
+    projectName: String,
+    created_by: String,
+    color: Color,
+    isExpanded: Boolean,
+    onClick: () -> Unit,
+    apiViewModel: ProjectsAPIViewModel
 ) {
-
     Column(
         modifier = Modifier
             .width(346.dp)
@@ -119,9 +136,7 @@ fun projectView(
                     durationMillis = 800, easing = FastOutSlowInEasing
                 )
             )
-            .clickable {
-
-            },
+            .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -139,7 +154,7 @@ fun projectView(
                 ), fontSize = 22.sp, style = TextStyle(fontWeight = FontWeight.ExtraBold)
             )
             Text(
-                text = "created by: " + created_by, fontFamily = FontFamily(
+                text = "created by: $created_by", fontFamily = FontFamily(
                     Font(R.font.font)
                 )
             )
@@ -171,5 +186,31 @@ fun projectView(
                 ), fontSize = 14.sp, modifier = Modifier.padding(bottom = 10.dp)
             )
         }
+
+        if (isExpanded) {
+            ProjectButtons(apiViewModel = apiViewModel, projectID = projectID)
+        }
+    }
+}
+
+
+@Composable
+fun ProjectButtons(
+    apiViewModel: ProjectsAPIViewModel,
+    projectID: Int
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+    ) {
+        DeleteButton(
+            apiViewModel = apiViewModel,
+            projectID = projectID
+        )
+        ProjectsTaskBtn()
+        EditButton()
     }
 }

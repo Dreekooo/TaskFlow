@@ -31,7 +31,7 @@ class ProjectsAPIViewModel : ViewModel() {
     private val _allUsers = MutableStateFlow<List<User>>(emptyList())
     val allUsers: StateFlow<List<User>> = _allUsers
 
-    private val retrofit: Retrofit = Retrofit.Builder().baseUrl("http://192.168.68.106:8080/")
+    private val retrofit: Retrofit = Retrofit.Builder().baseUrl("http://192.168.68.114:8080/")
         .addConverterFactory(GsonConverterFactory.create()).build()
 
     private val api: ProjectInterface = retrofit.create(ProjectInterface::class.java)
@@ -245,4 +245,24 @@ class ProjectsAPIViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteProjectById(projectId: Int) {
+        val apiService: ProjectInterface = retrofit.create(ProjectInterface::class.java)
+        val call = apiService.deleteProject(projectId)
+
+        call.enqueue(object : retrofit2.Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: retrofit2.Response<Void>) {
+                if (response.isSuccessful) {
+                    println("Projekt o ID $projectId został pomyślnie usunięty.")
+                } else {
+                    println("Nie udało się usunąć projektu. Kod odpowiedzi: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("Wystąpił błąd podczas próby usunięcia projektu: ${t.message}")
+            }
+        })
+    }
+
 }

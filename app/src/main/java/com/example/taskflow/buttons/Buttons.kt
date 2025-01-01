@@ -7,8 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.PersonAddAlt1
+import androidx.compose.material.icons.rounded.Task
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -108,6 +111,67 @@ fun AddRoleButton(
     ) {
         Icon(
             Icons.Rounded.PersonAddAlt1,
+            contentDescription = stringResource(R.string.plus_content),
+            modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
+@Composable
+fun DeleteButton(
+    apiViewModel: ProjectsAPIViewModel,
+    projectID: Int
+) {
+    FloatingActionButton(
+        onClick = {
+            apiViewModel.deleteProjectById(projectID)
+        },
+        modifier = Modifier.size(70.dp),
+        shape = CircleShape,
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.Delete,
+            contentDescription = stringResource(R.string.plus_content),
+            modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
+@Composable
+fun EditButton(
+) {
+    FloatingActionButton(
+        onClick = {
+
+        },
+        modifier = Modifier.size(70.dp),
+        shape = CircleShape,
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.Edit,
+            contentDescription = stringResource(R.string.plus_content),
+            modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
+@Composable
+fun ProjectsTaskBtn() {
+    FloatingActionButton(
+        onClick = {
+
+        },
+        modifier = Modifier.size(70.dp),
+        shape = CircleShape,
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.Task,
             contentDescription = stringResource(R.string.plus_content),
             modifier = Modifier.size(34.dp)
         )
