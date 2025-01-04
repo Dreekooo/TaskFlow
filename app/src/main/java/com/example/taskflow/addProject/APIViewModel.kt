@@ -180,6 +180,79 @@ class ProjectsAPIViewModel : ViewModel() {
         })
     }
 
+    fun updateProjectUser(projectId: Int, userId: Int, role: Int) {
+        val projectUser = ProjectUserPOST(projectId, userId, role)
+
+        val projectUserApi = retrofit.create(POSTUsersInterface::class.java)
+
+        projectUserApi.updateProjectUser(projectUser).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d(
+                        "API_SUCCESS",
+                        "User $userId updated for project $projectId with new role $role"
+                    )
+                } else {
+                    Log.e("API_ERROR", "Error updating user in project: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("API_EXCEPTION", "Failed to update user in project: $t")
+            }
+        })
+    }
+
+
+    fun updateProjectRoles(
+        projectName: String,
+        projectDescription: String,
+        createdBy: Int,
+        userRoles: Map<Int, Set<Int>>
+    ) {
+        val project = ProjectPost(projectName, projectDescription, createdBy)
+
+        val projectApi = retrofit.create(POSTUsersInterface::class.java)
+
+        projectApi.updateProject(project).enqueue(object : Callback<Response<Void>> {
+            override fun onResponse(
+                call: Call<Response<Void>>,
+                response: Response<Response<Void>>
+            ) {
+                if (response.isSuccessful) {
+                    val projectWithMaxId: Project? = projects.value.maxByOrNull { it.id }
+
+                    Log.d("users", userRoles.size.toString())
+                    Log.d("API_SUCCESS", "Project updated successfully!")
+
+                    userRoles.forEach { (userId, roleIds) ->
+                        roleIds.forEach { roleId ->
+                            if (projectWithMaxId != null) {
+                                updateProjectUser(
+                                    projectWithMaxId.id + 1,
+                                    userId,
+                                    roleId
+                                )
+                            } else {
+                                updateProjectUser(
+                                    1,
+                                    userId,
+                                    roleId
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Log.e("API_ERROR", "Error updating project: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Response<Void>>, t: Throwable) {
+                Log.e("API_EXCEPTION", "Failed to update project: $t")
+            }
+        })
+    }
+
 
     fun addRole(name: String) {
         val role = RolePost(name)
