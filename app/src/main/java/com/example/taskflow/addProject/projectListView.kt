@@ -41,6 +41,7 @@ import com.example.taskflow.buttons.AddProjectButton
 import com.example.taskflow.buttons.DeleteButton
 import com.example.taskflow.buttons.EditButton
 import com.example.taskflow.buttons.ProjectsTaskBtn
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun ProjectList(
@@ -76,7 +77,6 @@ fun ProjectList(
             } else {
                 items(projects) { project ->
                     var userName by remember { mutableStateOf("") }
-                    var expandedProjectId by remember { mutableStateOf<Int?>(null) }
 
                     LaunchedEffect(project.created_by) {
                         apiViewModel.fetchUserById(project.created_by) { user ->
@@ -89,12 +89,13 @@ fun ProjectList(
                         projectName = project.name,
                         created_by = userName,
                         colorResource(R.color.project_color),
-                        isExpanded = expandedProjectId == project.id,
+                        isExpanded = projectViewModel.expandedId == project.id,
                         onClick = {
-                            expandedProjectId =
-                                if (expandedProjectId == project.id) null else project.id
+                            projectViewModel.expandedId =
+                                if (projectViewModel.expandedId == project.id) null else project.id
                         },
                         apiViewModel = apiViewModel,
+                        projectViewModel = projectViewModel
                     )
 
                     Log.d(
@@ -112,7 +113,7 @@ fun ProjectList(
      */
     AddProjectDialog(
         projectsViewModel = projectViewModel,
-        apiViewModel = apiViewModel
+        apiViewModel = apiViewModel,
     )
 }
 
@@ -124,7 +125,8 @@ fun ProjectView(
     color: Color,
     isExpanded: Boolean,
     onClick: () -> Unit,
-    apiViewModel: ProjectsAPIViewModel
+    apiViewModel: ProjectsAPIViewModel,
+    projectViewModel: ProjectViewModel
 ) {
     Column(
         modifier = Modifier
@@ -188,7 +190,11 @@ fun ProjectView(
         }
 
         if (isExpanded) {
-            ProjectButtons(apiViewModel = apiViewModel, projectID = projectID)
+            ProjectButtons(
+                apiViewModel = apiViewModel,
+                projectID = projectID,
+                projectViewModel = projectViewModel
+            )
         }
     }
 }
@@ -197,6 +203,7 @@ fun ProjectView(
 @Composable
 fun ProjectButtons(
     apiViewModel: ProjectsAPIViewModel,
+    projectViewModel: ProjectViewModel,
     projectID: Int
 ) {
     Row(
@@ -211,6 +218,8 @@ fun ProjectButtons(
             projectID = projectID
         )
         ProjectsTaskBtn()
-        EditButton()
+        EditButton(projectViewModel = projectViewModel, apiViewModel = apiViewModel)
     }
 }
+
+

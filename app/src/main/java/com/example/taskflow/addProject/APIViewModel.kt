@@ -51,6 +51,19 @@ class ProjectsAPIViewModel : ViewModel() {
         })
     }
 
+
+    private val _selectedProject = MutableStateFlow<Project?>(null)
+    val selectedProject: StateFlow<Project?> = _selectedProject
+    fun fetchProjectById(projectId: Int) {
+        fetchData(
+            { api.getProject(projectId) },
+            { project ->
+                _selectedProject.value = project
+            }
+        )
+    }
+
+
     fun fetchUserById(userId: Int, onSuccess: (User) -> Unit) {
         fetchData({ userApi.getUser(userId) }, onSuccess)
     }
@@ -246,6 +259,11 @@ class ProjectsAPIViewModel : ViewModel() {
         }
     }
 
+    fun clearUserRoles() {
+        _userRoles.value = emptyMap()
+
+    }
+
     fun deleteProjectById(projectId: Int) {
         val apiService: ProjectInterface = retrofit.create(ProjectInterface::class.java)
         val call = apiService.deleteProject(projectId)
@@ -264,5 +282,26 @@ class ProjectsAPIViewModel : ViewModel() {
             }
         })
     }
+
+    fun updateProjectById(projectId: Int, updatedProject: ProjectPost) {
+        val apiService: ProjectInterface = retrofit.create(ProjectInterface::class.java)
+        val call = apiService.updateProject(projectId, updatedProject)
+
+        call.enqueue(object : Callback<Project> {
+            override fun onResponse(call: Call<Project>, response: Response<Project>) {
+                if (response.isSuccessful) {
+                    val updatedProject = response.body()
+                    println("Projekt został zaktualizowany: ${updatedProject?.name}")
+                } else {
+                    println("Błąd podczas aktualizacji projektu. Kod: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Project>, t: Throwable) {
+                println("Nie udało się zaktualizować projektu: ${t.message}")
+            }
+        })
+    }
+
 
 }

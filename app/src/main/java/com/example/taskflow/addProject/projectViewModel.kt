@@ -12,13 +12,17 @@ class ProjectViewModel : ViewModel() {
     var projectName by mutableStateOf("")
     var roleName by mutableStateOf("")
     var isDialogShow by mutableStateOf(false)
-
+    var isEdit by mutableStateOf(false)
+    var expandedId by mutableStateOf<Int?>(null)
 
     fun onDismissRequest() {
         isDialogShow = false
-        enabled = false
-        projectDescription = ""
-        projectName = ""
-        roleName = ""
     }
+
+
+    fun editProject() {
+        isDialogShow = true
+        isEdit = true
+    }
+
 }

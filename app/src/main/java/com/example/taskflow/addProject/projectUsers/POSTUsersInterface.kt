@@ -4,6 +4,7 @@ import retrofit2.Call
 import com.example.taskflow.addProject.ProjectPost
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface POSTUsersInterface {
@@ -13,4 +14,7 @@ interface POSTUsersInterface {
 
     @POST("project-users/")
     fun addProjectUser(@Body projectUser: ProjectUserPOST): Call<Void>
+
+    @GET("project-users/")
+    fun getAllProjectUsers(): ProjectUserPOST
 }

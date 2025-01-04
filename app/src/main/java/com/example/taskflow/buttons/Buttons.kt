@@ -15,11 +15,13 @@ import androidx.compose.material.icons.rounded.Task
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.example.taskflow.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
 
@@ -46,11 +48,12 @@ fun CloseButton(
 
 @Composable
 fun SubmitButton(
-    projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
+    projectViewModel: ProjectViewModel,
+    apiViewModel: ProjectsAPIViewModel,
 ) {
     FloatingActionButton(
         onClick = {
-            fetchProject(projectViewModel = projectViewModel, apiViewModel = apiViewModel)
+            edit(apiViewModel, projectViewModel)
         },
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
@@ -91,13 +94,42 @@ fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectVi
         1,
         apiViewModel.userRoles.value
     )
-    projectViewModel.onDismissRequest()
 }
+
+fun edit(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
+    val projectPost = ProjectPost(
+        name = projectViewModel.projectName,
+        description = projectViewModel.projectDescription,
+        created_by = 1
+    )
+
+    if (projectViewModel.isEdit) {
+        projectViewModel.expandedId?.let {
+            apiViewModel.updateProjectById(
+                it,
+                projectPost
+            )
+        }
+    } else {
+        fetchProject(apiViewModel, projectViewModel)
+    }
+    onDismissRequest(projectViewModel, apiViewModel)
+}
+
+fun onDismissRequest(projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel) {
+    projectViewModel.isDialogShow = false
+    projectViewModel.enabled = false
+    projectViewModel.projectDescription = ""
+    projectViewModel.projectName = ""
+    projectViewModel.roleName = ""
+    projectViewModel.isEdit = false
+    apiViewModel.clearUserRoles()
+}
+
 
 @Composable
 fun AddRoleButton(
-    apiViewModel: ProjectsAPIViewModel,
-    viewModel: ProjectViewModel
+    apiViewModel: ProjectsAPIViewModel, viewModel: ProjectViewModel
 ) {
     FloatingActionButton(
         onClick = {
@@ -119,8 +151,7 @@ fun AddRoleButton(
 
 @Composable
 fun DeleteButton(
-    apiViewModel: ProjectsAPIViewModel,
-    projectID: Int
+    apiViewModel: ProjectsAPIViewModel, projectID: Int
 ) {
     FloatingActionButton(
         onClick = {
@@ -141,10 +172,13 @@ fun DeleteButton(
 
 @Composable
 fun EditButton(
+    projectViewModel: ProjectViewModel,
+    apiViewModel: ProjectsAPIViewModel
 ) {
     FloatingActionButton(
         onClick = {
-
+            projectViewModel.editProject()
+            dataToEdit(projectViewModel, apiViewModel)
         },
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
@@ -176,4 +210,19 @@ fun ProjectsTaskBtn() {
             modifier = Modifier.size(34.dp)
         )
     }
+}
+
+fun dataToEdit(
+    projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
+) {
+
+    projectViewModel.expandedId?.let { apiViewModel.fetchProjectById(it) }
+
+    val project = apiViewModel.selectedProject
+    apiViewModel.fetchUserRoles()
+
+    projectViewModel.projectName = project.value?.name ?: ""
+    projectViewModel.projectDescription = project.value?.description ?: ""
+
+
 }
