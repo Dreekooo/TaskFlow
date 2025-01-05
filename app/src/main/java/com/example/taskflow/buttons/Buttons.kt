@@ -9,13 +9,11 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.PersonAddAlt1
 import androidx.compose.material.icons.rounded.Task
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import com.example.taskflow.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -53,7 +51,7 @@ fun SubmitButton(
 ) {
     FloatingActionButton(
         onClick = {
-            edit(apiViewModel, projectViewModel)
+            editOrAdd(apiViewModel, projectViewModel)
         },
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
@@ -96,7 +94,7 @@ fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectVi
     )
 }
 
-fun edit(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
+fun editOrAdd(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
     val projectPost = ProjectPost(
         name = projectViewModel.projectName,
         description = projectViewModel.projectDescription,
@@ -104,17 +102,24 @@ fun edit(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel)
     )
 
     if (projectViewModel.isEdit) {
-        projectViewModel.expandedId?.let {
-            apiViewModel.updateProjectById(
-                it,
-                projectPost
-            )
+        projectViewModel.expandedId?.let { projectId ->
+            apiViewModel.updateProjectById(projectId, projectPost)
+
+            apiViewModel.deleteProjectUsersByProjectId(projectId)
+
+            val userRoles = apiViewModel.userRoles.value
+            userRoles.forEach { (userId, roleIds) ->
+                roleIds.forEach { roleId ->
+                    apiViewModel.addProjectUser(projectId, userId, roleId)
+                }
+            }
         }
     } else {
         fetchProject(apiViewModel, projectViewModel)
     }
     onDismissRequest(projectViewModel, apiViewModel)
 }
+
 
 fun onDismissRequest(projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel) {
     projectViewModel.isDialogShow = false
@@ -219,7 +224,8 @@ fun dataToEdit(
     projectViewModel.expandedId?.let { apiViewModel.fetchProjectById(it) }
 
     val project = apiViewModel.selectedProject
-    apiViewModel.fetchUserRoles()
+
+
 
     projectViewModel.projectName = project.value?.name ?: ""
     projectViewModel.projectDescription = project.value?.description ?: ""

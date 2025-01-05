@@ -354,6 +354,7 @@ class ProjectsAPIViewModel : ViewModel() {
                 println("Wystąpił błąd podczas próby usunięcia projektu: ${t.message}")
             }
         })
+        deleteProjectUsersByProjectId(projectId)
     }
 
     fun updateProjectById(projectId: Int, updatedProject: ProjectPost) {
@@ -377,4 +378,31 @@ class ProjectsAPIViewModel : ViewModel() {
     }
 
 
+    fun deleteProjectUsersByProjectId(projectId: Int) {
+        val api = retrofit.create(POSTUsersInterface::class.java)
+        viewModelScope.launch {
+            try {
+                val projectUsers = api.getProjectUsersByProjectId(projectId)
+
+                projectUsers.forEach { projectUser ->
+                    val response = api.deleteProjectUser(projectUser.id)
+                    if (response.isSuccessful) {
+                        Log.d(
+                            "ProjectsViewModel",
+                            "Deleted ProjectUser ID: ${projectUser.id}"
+                        )
+                    } else {
+                        Log.e(
+                            "ProjectsViewModel",
+                            "Failed to delete ProjectUser ID: ${projectUser.id}, Error: ${
+                                response.errorBody()?.string()
+                            }"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ProjectsViewModel", "Error deleting project users: ${e.message}")
+            }
+        }
+    }
 }
