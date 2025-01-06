@@ -16,3 +16,7 @@ val textEdit = Color(0xFF636363)
 val placeholder = Color(0x55DFDFDF)
 val iconColor = Color(0xFFE8EAED)
 val radioButton = Color(0xFF333333)
+
+val important = Color(0xFF871B1B)
+val normal = Color(0xFF24618A)
+val less = Color(0xFF1D703D)
