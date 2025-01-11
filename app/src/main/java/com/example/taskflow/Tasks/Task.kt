@@ -8,5 +8,5 @@ data class Task(
     @SerializedName("title") val title: String,
     @SerializedName("start_date") val created: Date,
     @SerializedName("due_date") val end: Date,
-    @SerializedName("status") val status: Int,
+    @SerializedName("priority") val priority: Int,
 )

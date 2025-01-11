@@ -56,7 +56,7 @@ fun CustomRadioButton(
             Icon(
                 imageVector = if (isSelected) Icons.Rounded.Circle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = "Radio button icon",
-                tint = radioButton,
+                tint = color,
                 modifier = Modifier.size(iconSize)
             )
 

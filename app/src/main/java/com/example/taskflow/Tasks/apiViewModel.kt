@@ -63,4 +63,15 @@ class ApiTaskViewModel : ViewModel() {
             }
         }
     }
+
+    private val _selectedUsers = MutableStateFlow<List<Int>>(emptyList())
+    val selectedUsers: StateFlow<List<Int>> = _selectedUsers
+
+    fun onSelectionChanged(userId: Int) {
+        _selectedUsers.value = if (_selectedUsers.value.contains(userId)) {
+            _selectedUsers.value - userId
+        } else {
+            _selectedUsers.value + userId
+        }
+    }
 }

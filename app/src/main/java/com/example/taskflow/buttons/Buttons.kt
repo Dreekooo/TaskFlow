@@ -1,5 +1,6 @@
 package com.example.taskflow.buttons
 
+import android.util.Log
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import com.example.taskflow.Tasks.taskViewModel
 import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
@@ -38,6 +41,48 @@ fun CloseButton(
     ) {
         Icon(
             Icons.Rounded.Close,
+            contentDescription = stringResource(R.string.plus_content),
+            modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
+@Composable
+fun CloseButton(
+    taskViewModel: taskViewModel,
+) {
+    FloatingActionButton(
+        onClick = {
+            taskViewModel.isDialogShow = false
+        },
+        modifier = Modifier.size(70.dp),
+        shape = CircleShape,
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.Close,
+            contentDescription = stringResource(R.string.plus_content),
+            modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
+@Composable
+fun AddTasksButton(
+    taskViewModel: taskViewModel
+) {
+    FloatingActionButton(
+        onClick = {
+            taskViewModel.isDialogShow = true
+        },
+        modifier = Modifier.size(70.dp),
+        shape = CircleShape,
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.Add,
             contentDescription = stringResource(R.string.plus_content),
             modifier = Modifier.size(34.dp)
         )
@@ -84,6 +129,7 @@ fun AddProjectButton(
         )
     }
 }
+
 
 fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
     apiViewModel.addProjectRoles(

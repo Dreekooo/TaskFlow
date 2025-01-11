@@ -1,5 +1,6 @@
 package com.example.taskflow.Tasks
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.taskflow.addProject.ProjectViewModel
+import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.buttons.AddProjectButton
+import com.example.taskflow.buttons.AddTasksButton
 
 @Composable
 fun TasksList(
     apiTaskViewModel: ApiTaskViewModel,
-    projectViewModel: ProjectViewModel
+    taskViewModel: taskViewModel,
+    apiViewModel: ProjectsAPIViewModel
 ) {
     val tasks by apiTaskViewModel.tasks.collectAsState()
 
@@ -33,6 +37,18 @@ fun TasksList(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp, end = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                AddTasksButton(
+                    taskViewModel,
+                )
+            }
 
         }
     }) { innerPadding ->
@@ -53,7 +69,7 @@ fun TasksList(
                     TaskView(
                         taskID = task.id,
                         taskName = task.title,
-                        taskType = task.status,
+                        taskType = task.priority,
                         taskCreated = task.created,
                         taskEnd = task.end,
                         isExpanded = false,
@@ -66,5 +82,14 @@ fun TasksList(
                 }
             }
         }
+
+        if (taskViewModel.isDialogShow) {
+            addTaskDialog(
+                taskViewModel = taskViewModel,
+                apiViewModel = apiViewModel
+            )
+        }
+        Log.d("shoDialog", taskViewModel.isDialogShow.toString())
+
     }
 }
