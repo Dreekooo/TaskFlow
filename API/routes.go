@@ -73,6 +73,7 @@ func SetupRoutes(db *sql.DB) *mux.Router {
 	protected.Use(middleware.JWTMiddleware)
 
 	protected.HandleFunc("/users/delete/", handlers.DeleteOwnAccountHandler(db)).Methods("DELETE") // Usuwanie własnego konta
+	protected.HandleFunc("/users/me/", handlers.GetLoggedInUserHandler(db)).Methods("GET")         // Zwracanie zalogowanego użytkownika
 
 	return r
 }

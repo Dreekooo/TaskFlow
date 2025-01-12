@@ -150,7 +150,8 @@ A pre-filled SQLite test database is included in the repository: **`test-files/t
 - `GET /users/{id}/` - Get user by ID
 - `PUT /users/{id}/` - Update user
 - `DELETE /users/{id}/` - Delete user
-- `GET /users/` - Get all users (requires JWT)
+- `DELETE /api/users/delete/` - Delete current user (requires JWT)
+- `GET /api/users/me/` - Get current user (requires JWT)
 
 ### **Projects**
 - `POST /projects/` - Create a project

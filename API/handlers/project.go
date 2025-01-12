@@ -78,7 +78,7 @@ func GetProjectByIdHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		var project Project
-		err = db.QueryRow("SELECT project_id, name, description, created_by FROM Projects WHERE user_id = ?", ProjectID).
+		err = db.QueryRow("SELECT project_id, name, description, created_by FROM Projects WHERE project_id = ?", ProjectID).
 			Scan(&project.ProjectID, &project.Name, &project.Description, &project.CreatedBy)
 		if err != nil {
 			if err == sql.ErrNoRows {

@@ -321,3 +321,51 @@ func DeleteOwnAccountHandler(db *sql.DB) http.HandlerFunc {
 		})
 	}
 }
+
+func GetLoggedInUserHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Pobierz token z nagłówka Authorization
+		tokenString := r.Header.Get("Authorization")
+		if tokenString == "" {
+			http.Error(w, "Authorization header required", http.StatusUnauthorized)
+			return
+		}
+
+		// Walidacja i parsowanie tokena JWT
+		claims, err := utils.ValidateToken(tokenString)
+		if err != nil {
+			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			return
+		}
+
+		// Pobierz user_id z tokena
+		userIDFloat, ok := claims["user_id"].(float64)
+		if !ok {
+			http.Error(w, "Invalid token data", http.StatusUnauthorized)
+			return
+		}
+		userID := int(userIDFloat)
+
+		// Pobierz dane użytkownika z bazy danych
+		var user User
+		err = db.QueryRow(
+			"SELECT user_id, email, username, first_name, last_name, created_at FROM Users WHERE user_id = ?",
+			userID,
+		).Scan(&user.UserID, &user.Email, &user.Username, &user.FirstName, &user.LastName, &user.CreatedAt)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				http.Error(w, "User not found", http.StatusNotFound)
+				return
+			}
+			http.Error(w, "Failed to fetch user", http.StatusInternalServerError)
+			return
+		}
+
+		// Usuń hasło z odpowiedzi, aby zwiększyć bezpieczeństwo
+		user.PasswordHash = ""
+
+		// Zwróć dane użytkownika w odpowiedzi JSON
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(user)
+	}
+}
