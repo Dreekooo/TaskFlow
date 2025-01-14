@@ -1,5 +1,6 @@
 package com.example.taskflow.Tasks
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +52,7 @@ import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.buttons.CloseButton
 import com.example.taskflow.buttons.CustomRadioButton
 import com.example.taskflow.buttons.SubmitButton
+import com.example.taskflow.buttons.SubmitButtonTask
 import com.example.taskflow.ui.theme.backgroundDialog
 import com.example.taskflow.ui.theme.iconColor
 import com.example.taskflow.ui.theme.important
@@ -110,12 +112,15 @@ fun addTaskDialog(
                         TaskDescription(taskViewModel = taskViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         TaskTypeCheckList(
-                            taskViewModel()
+                            taskViewModel
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
                         AllUsers(viewModel = apiViewModel, apiTaskViewModel = ApiTaskViewModel())
                         Spacer(modifier = Modifier.padding(5.dp))
-                        ButtonsProjects(taskViewModel = taskViewModel, apiViewModel)
+                        ButtonsProjects(
+                            taskViewModel = taskViewModel,
+                            apiTaskViewModel = ApiTaskViewModel()
+                        )
                     }
                 }
             }
@@ -298,17 +303,18 @@ fun TaskTypeCheckList(
                 textSize = 15.dp
             )
         }
+
     }
 }
 
 @Composable
-fun ButtonsProjects(taskViewModel: taskViewModel, apiViewModel: ProjectsAPIViewModel) {
+fun ButtonsProjects(taskViewModel: taskViewModel, apiTaskViewModel: ApiTaskViewModel) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CloseButton(taskViewModel)
-        SubmitButton(ProjectViewModel(), apiViewModel)
+        SubmitButtonTask(taskViewModel, apiTaskViewModel)
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -74,4 +75,33 @@ class ApiTaskViewModel : ViewModel() {
             _selectedUsers.value + userId
         }
     }
+
+
+    fun addTaskToProject(task: addTask) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = api.addTasks(task)
+                if (response.isSuccessful) {
+                    Log.d("success", "Task added successfully")
+                } else {
+                    Log.e("error", "Error from API: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("exception", "Exception occurred: ${e.message}")
+            }
+        }
+    }
+
+
+    fun addTask(taskTitle: String, description: String, type: Int) {
+        val task =
+            addTask(
+                name = taskTitle,
+                description = description,
+                type = type
+            )
+
+        addTaskToProject(task)
+    }
+
 }

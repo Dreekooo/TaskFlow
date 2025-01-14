@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskFLowTheme {
-                //ProjectList(ProjectsAPIViewModel(), projectViewModel = ProjectViewModel())
+//                ProjectList(ProjectsAPIViewModel(), projectViewModel = ProjectViewModel())
 
                 TasksList(
                     apiTaskViewModel = ApiTaskViewModel(),

@@ -21,6 +21,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.taskflow.Tasks.ApiTaskViewModel
+import com.example.taskflow.Tasks.addTask
 import com.example.taskflow.Tasks.taskViewModel
 import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
@@ -108,6 +110,33 @@ fun SubmitButton(
         )
     }
 }
+
+@Composable
+fun SubmitButtonTask(
+    taskViewModel: taskViewModel,
+    apiTaskViewModel: ApiTaskViewModel
+) {
+    FloatingActionButton(
+        onClick = {
+            taskViewModel.selectedTaskType?.let {
+                apiTaskViewModel.addTask(
+                    taskViewModel.taskTitle,
+                    taskViewModel.descriptionTask,
+                    it
+                )
+            }
+        },
+        modifier = Modifier.size(70.dp),
+        shape = CircleShape,
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Icon(
+            Icons.Rounded.Check, contentDescription = "", modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
 
 @Composable
 fun AddProjectButton(

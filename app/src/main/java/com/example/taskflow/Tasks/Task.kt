@@ -10,3 +10,9 @@ data class Task(
     @SerializedName("due_date") val end: Date,
     @SerializedName("priority") val priority: Int,
 )
+
+data class addTask(
+    @SerializedName("title") val name: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("priority") val type: Int
+)
