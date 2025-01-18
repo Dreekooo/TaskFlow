@@ -1,6 +1,8 @@
 package com.example.taskflow.addProject
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -42,6 +44,7 @@ import com.example.taskflow.buttons.DeleteButton
 import com.example.taskflow.buttons.EditButton
 import com.example.taskflow.buttons.ProjectsTaskBtn
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProjectList(
     apiViewModel: ProjectsAPIViewModel,
@@ -83,10 +86,15 @@ fun ProjectList(
                         }
                     }
 
+                    val formattedDate =
+                        project.deadline?.let { projectViewModel.formatTimestamp(it) }
+                            ?: "Nieznana data"
+
                     ProjectView(
                         projectID = project.id,
                         projectName = project.name,
                         created_by = userName,
+                        startDate = formattedDate,
                         colorResource(R.color.project_color),
                         isExpanded = projectViewModel.expandedId == project.id,
                         onClick = {
@@ -94,7 +102,7 @@ fun ProjectList(
                                 if (projectViewModel.expandedId == project.id) null else project.id
                         },
                         apiViewModel = apiViewModel,
-                        projectViewModel = projectViewModel
+                        projectViewModel = projectViewModel,
                     )
 
                     Log.d(
@@ -121,6 +129,7 @@ fun ProjectView(
     projectID: Int,
     projectName: String,
     created_by: String,
+    startDate: String,
     color: Color,
     isExpanded: Boolean,
     onClick: () -> Unit,
@@ -176,7 +185,7 @@ fun ProjectView(
                 .align(Alignment.Start),
         ) {
             Text(
-                text = "start date: 12.04.2024", fontFamily = FontFamily(
+                text = "start date:" + startDate, fontFamily = FontFamily(
                     Font(R.font.font)
                 ), fontSize = 14.sp, modifier = Modifier.padding(bottom = 10.dp)
             )

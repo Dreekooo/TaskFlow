@@ -12,9 +12,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Date
 
 class ApiTaskViewModel : ViewModel() {
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
@@ -77,7 +80,7 @@ class ApiTaskViewModel : ViewModel() {
     }
 
 
-    fun addTaskToProject(task: addTask) {
+    fun addTaskToProject(task: PostTask) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = api.addTasks(task)
@@ -92,13 +95,55 @@ class ApiTaskViewModel : ViewModel() {
         }
     }
 
+    fun deleteTaskById(taskId: Int) {
+        val apiService: TasksInterface = retrofit.create(TasksInterface::class.java)
+        val call = apiService.deleteTask(taskId)
 
-    fun addTask(taskTitle: String, description: String, type: Int) {
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                Log.e("IDDDD", taskId.toString())
+                if (response.isSuccessful) {
+                    println("Zadanie o ID $taskId zostało pomyślnie usunięte.")
+                } else {
+                    println("Nie udało się usunąć zadania. Kod odpowiedzi: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("Wystąpił błąd podczas próby usunięcia zadania: ${t.message}")
+            }
+        })
+
+    }
+
+
+    fun updateTaskById(task_id: Int, updatedTask: PostTask) {
+        val apiService: TasksInterface = retrofit.create(TasksInterface::class.java)
+        val call = apiService.updateTask(task_id, updatedTask)
+
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    println("Zadanie o task_id $task_id zostało pomyślnie zaktualizowane.")
+                } else {
+                    println("Nie udało się zaktualizować zadania. Kod odpowiedzi: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("Wystąpił błąd podczas próby aktualizacji zadania: ${t.message}")
+            }
+        })
+    }
+
+
+    fun addTask(taskTitle: String, description: String, type: Int, end: java.sql.Date) {
         val task =
-            addTask(
-                name = taskTitle,
+            PostTask(
+                title = taskTitle,
                 description = description,
-                type = type
+                priority = type,
+                end = end
             )
 
         addTaskToProject(task)

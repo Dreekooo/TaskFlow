@@ -1,6 +1,7 @@
 package com.example.taskflow.Tasks
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,25 +23,34 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Task
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +72,7 @@ import com.example.taskflow.ui.theme.normal
 import com.example.taskflow.ui.theme.radioButton
 import com.example.taskflow.ui.theme.textColor
 import com.example.taskflow.ui.theme.textEdit
+import java.util.regex.Pattern
 
 
 @Composable
@@ -114,6 +126,8 @@ fun addTaskDialog(
                         TaskTypeCheckList(
                             taskViewModel
                         )
+                        Spacer(modifier = Modifier.padding(5.dp))
+                        DateInputForm(taskViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
                         AllUsers(viewModel = apiViewModel, apiTaskViewModel = ApiTaskViewModel())
                         Spacer(modifier = Modifier.padding(5.dp))
@@ -207,7 +221,7 @@ fun TaskDescription(taskViewModel: taskViewModel) {
                 textAlign = TextAlign.Start, fontSize = 14.sp
             ),
             modifier = Modifier
-                .size(500.dp, 250.dp)
+                .size(500.dp, 150.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .padding(start = 20.dp)
                 .fillMaxWidth()
@@ -306,6 +320,63 @@ fun TaskTypeCheckList(
 
     }
 }
+
+@Composable
+fun DateInputForm(
+    taskViewModel: taskViewModel
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+    ) {
+        Text(
+            text = "deadline date:",
+            textAlign = TextAlign.Left,
+            modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            color = textColor,
+            fontFamily = FontFamily(
+                Font(R.font.font)
+            )
+        )
+        OutlinedTextField(
+            value = taskViewModel.date1,
+            onValueChange = { taskViewModel.date1 = it },
+            placeholder = { Text("dd.mm.rrrr") },
+            textStyle = TextStyle(textAlign = TextAlign.Justify),
+            modifier = Modifier
+                .size(500.dp, 50.dp)
+                .padding(start = 17.dp, end = 25.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .border(
+                    width = 2.dp, color = textEdit, shape = RoundedCornerShape(10.dp)
+                ),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            ),
+            shape = RoundedCornerShape(10.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = textEdit,
+                unfocusedBorderColor = textEdit,
+                focusedContainerColor = textEdit,
+                unfocusedContainerColor = textEdit,
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor
+            )
+        )
+
+        Text(
+            text = taskViewModel.error,
+            textAlign = TextAlign.Left,
+            modifier = Modifier.padding(start = 20.dp, bottom = 4.dp),
+            color = important,
+            fontFamily = FontFamily(
+                Font(R.font.font)
+            )
+        )
+    }
+}
+
 
 @Composable
 fun ButtonsProjects(taskViewModel: taskViewModel, apiTaskViewModel: ApiTaskViewModel) {

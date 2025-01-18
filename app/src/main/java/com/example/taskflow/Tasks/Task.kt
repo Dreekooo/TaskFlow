@@ -11,8 +11,9 @@ data class Task(
     @SerializedName("priority") val priority: Int,
 )
 
-data class addTask(
-    @SerializedName("title") val name: String,
-    @SerializedName("description") val description: String,
-    @SerializedName("priority") val type: Int
+data class PostTask(
+    @SerializedName("title") val title: String,
+    @SerializedName("due_date") val end: java.sql.Date,
+    @SerializedName("priority") val priority: Int,
+    @SerializedName("description") val description: String
 )

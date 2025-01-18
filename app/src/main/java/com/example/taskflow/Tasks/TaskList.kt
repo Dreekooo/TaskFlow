@@ -16,9 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
-import com.example.taskflow.buttons.AddProjectButton
 import com.example.taskflow.buttons.AddTasksButton
 
 @Composable
@@ -72,12 +70,13 @@ fun TasksList(
                         taskType = task.priority,
                         taskCreated = task.created,
                         taskEnd = task.end,
-                        isExpanded = false,
+                        isExpanded = taskViewModel.expandedId == task.id,
                         onClick = {
-
+                            taskViewModel.expandedId =
+                                if (taskViewModel.expandedId == task.id) null else task.id
                         },
-                        apiViewModel = apiTaskViewModel,
-                        taskViewModel = taskViewModel()
+                        taskViewModel = taskViewModel,
+                        apiTaskViewModel = apiTaskViewModel
                     )
                 }
             }
@@ -89,7 +88,5 @@ fun TasksList(
                 apiViewModel = apiViewModel
             )
         }
-        Log.d("shoDialog", taskViewModel.isDialogShow.toString())
-
     }
 }

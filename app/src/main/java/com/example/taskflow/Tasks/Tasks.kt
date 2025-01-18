@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +27,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskflow.R
+import com.example.taskflow.addProject.ProjectViewModel
+import com.example.taskflow.addProject.ProjectsAPIViewModel
+import com.example.taskflow.buttons.DeleteButton
+import com.example.taskflow.buttons.DeleteTaskButton
+import com.example.taskflow.buttons.EditButton
+import com.example.taskflow.buttons.EditTaskButton
+import com.example.taskflow.buttons.ProjectsTaskBtn
 import com.example.taskflow.ui.theme.important
 import com.example.taskflow.ui.theme.less
 import com.example.taskflow.ui.theme.normal
@@ -39,8 +48,8 @@ fun TaskView(
     taskEnd: Date,
     isExpanded: Boolean,
     onClick: () -> Unit,
-    apiViewModel: ApiTaskViewModel,
-    taskViewModel: taskViewModel
+    taskViewModel: taskViewModel,
+    apiTaskViewModel: ApiTaskViewModel
 ) {
     val color = when (taskType) {
         1 -> important
@@ -92,17 +101,9 @@ fun TaskView(
                 )
                 .align(Alignment.Start),
         ) {
-            Text(
-                text = "start date: " + taskViewModel.formatDate(taskCreated),
-                fontFamily = FontFamily(
-                    Font(R.font.font)
-                ),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
 
             Text(
-                text = "end time: " + taskViewModel.formatDate(taskEnd),
+                text = "deadline: " + taskViewModel.formatDate(taskEnd),
                 fontFamily = FontFamily(
                     Font(R.font.font)
                 ),
@@ -110,5 +111,41 @@ fun TaskView(
                 modifier = Modifier.padding(bottom = 10.dp)
             )
         }
+
+        if (isExpanded) {
+            TaskButtons(
+                taskID = taskID,
+                apiTaskViewModel = apiTaskViewModel,
+                taskViewModel = taskViewModel
+            )
+        }
+    }
+}
+
+@Composable
+fun TaskButtons(
+    taskID: Int,
+    apiTaskViewModel: ApiTaskViewModel,
+    taskViewModel: taskViewModel
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 600, easing = FastOutSlowInEasing
+                )
+            )
+    ) {
+        DeleteTaskButton(
+            apiTaskViewModel = apiTaskViewModel,
+            taskId = taskID,
+        )
+        EditTaskButton(
+            taskViewModel = taskViewModel
+        )
     }
 }
