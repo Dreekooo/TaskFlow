@@ -78,69 +78,70 @@ import java.util.regex.Pattern
 @Composable
 fun addTaskDialog(
     taskViewModel: taskViewModel,
-    apiViewModel: ProjectsAPIViewModel
+    apiViewModel: ProjectsAPIViewModel,
+    projectViewModel: ProjectViewModel
 ) {
-    if (taskViewModel.isDialogShow) {
-        Dialog(
-            onDismissRequest = {
-                taskViewModel.onDismissRequest()
-            },
-            properties = DialogProperties(
-                usePlatformDefaultWidth = false
-            ),
+    Dialog(
+        onDismissRequest = {
+            taskViewModel.onDismissRequest()
+        },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        ),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 40.dp, end = 40.dp)
         ) {
-            Box(
+            Icon(
+                imageVector = Icons.Rounded.Task,
+                contentDescription = "",
+                tint = iconColor,
+                modifier = Modifier
+                    .size(45.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(top = 25.dp)
+                    .zIndex(2f)
+            )
+
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 40.dp, end = 40.dp)
+                    .padding(top = 15.dp, bottom = 15.dp)
+                    .zIndex(1f),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = backgroundDialog
+                ),
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Task,
-                    contentDescription = "",
-                    tint = iconColor,
-                    modifier = Modifier
-                        .size(45.dp)
-                        .align(Alignment.TopEnd)
-                        .padding(top = 25.dp)
-                        .zIndex(2f)
-                )
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 15.dp, bottom = 15.dp)
-                        .zIndex(1f),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = backgroundDialog
-                    ),
+                Column(
+                    modifier = Modifier.padding(top = 15.dp, bottom = 15.dp),
                 ) {
-                    Column(
-                        modifier = Modifier.padding(top = 15.dp, bottom = 15.dp),
-                    ) {
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        TaskName(taskViewModel = taskViewModel)
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        TaskDescription(taskViewModel = taskViewModel)
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        TaskTypeCheckList(
-                            taskViewModel
-                        )
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        DateInputForm(taskViewModel)
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        AllUsers(viewModel = apiViewModel, apiTaskViewModel = ApiTaskViewModel())
-                        Spacer(modifier = Modifier.padding(5.dp))
-                        ButtonsProjects(
-                            taskViewModel = taskViewModel,
-                            apiTaskViewModel = ApiTaskViewModel()
-                        )
-                    }
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    TaskName(taskViewModel = taskViewModel)
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    TaskDescription(taskViewModel = taskViewModel)
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    TaskTypeCheckList(
+                        taskViewModel
+                    )
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    DateInputForm(taskViewModel)
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    AllUsers(viewModel = apiViewModel, apiTaskViewModel = ApiTaskViewModel())
+                    Spacer(modifier = Modifier.padding(5.dp))
+                    ButtonsProjects(
+                        taskViewModel = taskViewModel,
+                        apiTaskViewModel = ApiTaskViewModel(),
+                        projectViewModel = projectViewModel
+                    )
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun TaskName(
@@ -379,13 +380,13 @@ fun DateInputForm(
 
 
 @Composable
-fun ButtonsProjects(taskViewModel: taskViewModel, apiTaskViewModel: ApiTaskViewModel) {
+fun ButtonsProjects(taskViewModel: taskViewModel, apiTaskViewModel: ApiTaskViewModel, projectViewModel: ProjectViewModel) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CloseButton(taskViewModel)
-        SubmitButtonTask(taskViewModel, apiTaskViewModel)
+        SubmitButtonTask(taskViewModel, apiTaskViewModel, projectViewModel)
     }
 }

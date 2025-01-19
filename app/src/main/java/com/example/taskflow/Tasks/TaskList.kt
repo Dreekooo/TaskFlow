@@ -1,6 +1,5 @@
 package com.example.taskflow.Tasks
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +18,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.buttons.AddTasksButton
 
@@ -28,10 +27,18 @@ import com.example.taskflow.buttons.AddTasksButton
 fun TasksList(
     apiTaskViewModel: ApiTaskViewModel,
     taskViewModel: taskViewModel,
+    projectViewModel: ProjectViewModel,
     apiViewModel: ProjectsAPIViewModel,
     onNavigateBack: () -> Unit
 ) {
     val tasks by apiTaskViewModel.tasks.collectAsState()
+    val expandedID = projectViewModel.expandedId
+
+    val filteredTasks = tasks.filter { task ->
+        task.projectID == expandedID
+    }
+
+
 
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -86,10 +93,10 @@ fun TasksList(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            if (tasks.isEmpty()) {
+            if (filteredTasks.isEmpty()) {
                 item { Text(text = "No projects available") }
             } else {
-                items(tasks) { task ->
+                items(filteredTasks) { task ->
 
                     TaskView(
                         taskID = task.id,
@@ -113,7 +120,8 @@ fun TasksList(
         if (taskViewModel.isDialogShow) {
             addTaskDialog(
                 taskViewModel = taskViewModel,
-                apiViewModel = apiViewModel
+                apiViewModel = apiViewModel,
+                projectViewModel
             )
         }
     }

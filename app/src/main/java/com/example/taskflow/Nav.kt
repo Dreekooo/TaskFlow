@@ -13,7 +13,8 @@ import com.example.taskflow.addProject.ProjectsAPIViewModel
 
 @Composable
 fun Nav(
-    apiViewModel: ProjectsAPIViewModel
+    apiViewModel: ProjectsAPIViewModel,
+    projectViewModel: ProjectViewModel
 ) {
     val navController = rememberNavController()
 
@@ -24,7 +25,7 @@ fun Nav(
         composable("home") {
             ProjectList(
                 apiViewModel = apiViewModel,
-                projectViewModel = ProjectViewModel(),
+                projectViewModel = projectViewModel,
                 onNavigateToTask = {
                     navController.navigate("task")
                 }
@@ -37,7 +38,8 @@ fun Nav(
                 apiTaskViewModel = ApiTaskViewModel(),
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                projectViewModel = projectViewModel
             )
         }
     }

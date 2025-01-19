@@ -18,10 +18,7 @@ class taskViewModel : ViewModel() {
     var taskTitle by mutableStateOf("")
     var descriptionTask by mutableStateOf("")
     var date1 by mutableStateOf("")
-    var Valid by mutableStateOf(true)
-    var Valid2 by mutableStateOf(true)
     var error by mutableStateOf("")
-    var error1 by mutableStateOf("")
     var expandedId by mutableStateOf<Int?>(null)
     var update by mutableStateOf(false)
     fun formatDate(date: Date): String {

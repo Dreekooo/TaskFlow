@@ -1,6 +1,10 @@
 package com.example.taskflow.buttons
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,11 +17,15 @@ import androidx.compose.material.icons.rounded.PersonAddAlt1
 import androidx.compose.material.icons.rounded.Task
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.example.taskflow.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.PostTask
@@ -25,6 +33,7 @@ import com.example.taskflow.Tasks.taskViewModel
 import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
+import com.example.taskflow.ui.theme.backgroundDialog
 import java.util.Calendar
 
 @Composable
@@ -113,8 +122,8 @@ fun SubmitButton(
 
 @Composable
 fun SubmitButtonTask(
-    taskViewModel: taskViewModel,
-    apiTaskViewModel: ApiTaskViewModel
+    taskViewModel: taskViewModel, apiTaskViewModel: ApiTaskViewModel,
+    projectViewModel: ProjectViewModel
 ) {
     FloatingActionButton(
         onClick = {
@@ -123,28 +132,28 @@ fun SubmitButtonTask(
 
             if (taskViewModel.update) {
                 val postTask = taskViewModel.selectedTaskType?.let {
-                    PostTask(
-                        title = taskViewModel.taskTitle,
-                        description = taskViewModel.descriptionTask,
-                        priority = it,
-                        due_date = today
-                    )
+                    projectViewModel.expandedId?.let { it1 ->
+                        PostTask(
+                            title = taskViewModel.taskTitle,
+                            description = taskViewModel.descriptionTask,
+                            priority = it,
+                            due_date = today,
+                            projectID = it1
+                        )
+                    }
                 }
                 if (postTask != null) {
                     taskViewModel.expandedId?.let {
                         apiTaskViewModel.updateTaskById(
-                            task_id = it,
-                            updatedTask = postTask
+                            task_id = it, updatedTask = postTask,
                         )
                     }
                 }
             } else {
                 taskViewModel.selectedTaskType?.let {
                     apiTaskViewModel.addTask(
-                        taskViewModel.taskTitle,
-                        taskViewModel.descriptionTask,
-                        it,
-                        today
+                        taskViewModel.taskTitle, taskViewModel.descriptionTask, it, today,
+                        projectViewModel
                     )
                 }
             }
@@ -257,6 +266,96 @@ fun AddRoleButton(
 }
 
 @Composable
+fun LoginButton(
+) {
+    FloatingActionButton(
+        onClick = {
+
+        },
+        modifier = Modifier
+            .height(70.dp)
+            .width(120.dp)
+            .padding(20.dp),
+        shape = RoundedCornerShape(10.dp),
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Text(
+            text = "Login:",
+            textAlign = TextAlign.Center, // Wyśrodkowanie tekstu
+            modifier = Modifier
+                .fillMaxWidth() // Wypełnia całą szerokość dostępnego miejsca
+                .padding(bottom = 4.dp), // Dodanie paddingu u dołu
+            color = backgroundDialog,
+            fontFamily = FontFamily(
+                Font(R.font.font)
+            )
+        )
+    }
+}
+
+
+@Composable
+fun RegisterButton(
+) {
+    FloatingActionButton(
+        onClick = {
+
+        },
+        modifier = Modifier
+            .height(70.dp)
+            .width(120.dp)
+            .padding(20.dp),
+        shape = RoundedCornerShape(10.dp),
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Text(
+            text = "Register:",
+            textAlign = TextAlign.Center, // Wyśrodkowanie tekstu
+            modifier = Modifier
+                .fillMaxWidth() // Wypełnia całą szerokość dostępnego miejsca
+                .padding(bottom = 4.dp), // Dodanie paddingu u dołu
+            color = backgroundDialog,
+            fontFamily = FontFamily(
+                Font(R.font.font)
+            )
+        )
+    }
+}
+
+
+@Composable
+fun Submit(
+) {
+    FloatingActionButton(
+        onClick = {
+
+        },
+        modifier = Modifier
+            .height(70.dp)
+            .width(150.dp)
+            .padding(20.dp),
+        shape = RoundedCornerShape(10.dp),
+        contentColor = colorResource(R.color.button_description),
+        containerColor = colorResource(R.color.button_background)
+    ) {
+        Text(
+            text = "Zatwierdź",
+            textAlign = TextAlign.Center, // Wyśrodkowanie tekstu
+            modifier = Modifier
+                .fillMaxWidth() // Wypełnia całą szerokość dostępnego miejsca
+                .padding(bottom = 4.dp), // Dodanie paddingu u dołu
+            color = backgroundDialog,
+            fontFamily = FontFamily(
+                Font(R.font.font)
+            )
+        )
+    }
+}
+
+
+@Composable
 fun DeleteButton(
     apiViewModel: ProjectsAPIViewModel, projectID: Int
 ) {
@@ -279,8 +378,7 @@ fun DeleteButton(
 
 @Composable
 fun EditButton(
-    projectViewModel: ProjectViewModel,
-    apiViewModel: ProjectsAPIViewModel
+    projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
 ) {
     FloatingActionButton(
         onClick = {
@@ -325,8 +423,7 @@ fun EditTaskButton(
 
 @Composable
 fun DeleteTaskButton(
-    taskId: Int,
-    apiTaskViewModel: ApiTaskViewModel
+    taskId: Int, apiTaskViewModel: ApiTaskViewModel
 ) {
     FloatingActionButton(
         onClick = {

@@ -3,6 +3,7 @@ package com.example.taskflow.Tasks
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.users.UserInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -92,15 +93,26 @@ class ApiTaskViewModel : ViewModel() {
         }
     }
 
-    fun addTask(taskTitle: String, description: String, type: Int, date: Date) {
+    fun addTask(
+        taskTitle: String,
+        description: String,
+        type: Int,
+        date: Date,
+        projectViewModel: ProjectViewModel
+    ) {
         val task =
-            PostTask(
-                title = taskTitle,
-                description = description,
-                priority = type,
-                due_date = date
-            )
-        addTaskToProject(task)
+            projectViewModel.expandedId?.let {
+                PostTask(
+                    title = taskTitle,
+                    description = description,
+                    priority = type,
+                    due_date = date,
+                    projectID = it
+                )
+            }
+        if (task != null) {
+            addTaskToProject(task)
+        }
     }
 
     fun deleteTaskById(taskId: Int) {
