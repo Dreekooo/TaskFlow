@@ -6,6 +6,7 @@ import java.util.Date
 data class Task(
     @SerializedName("task_id") val id: Int,
     @SerializedName("title") val title: String,
+    @SerializedName("description") val description: String,
     @SerializedName("start_date") val created: Date,
     @SerializedName("due_date") val end: Date,
     @SerializedName("priority") val priority: Int,
@@ -13,7 +14,7 @@ data class Task(
 
 data class PostTask(
     @SerializedName("title") val title: String,
-    @SerializedName("due_date") val end: java.sql.Date,
     @SerializedName("priority") val priority: Int,
-    @SerializedName("description") val description: String
+    @SerializedName("description") val description: String,
+    @SerializedName("due_date") val due_date: Date
 )

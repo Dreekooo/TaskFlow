@@ -1,5 +1,6 @@
 package com.example.taskflow
 
+import UserForm
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.TasksList
 import com.example.taskflow.Tasks.taskViewModel
+import com.example.taskflow.User.ViewModel
 import com.example.taskflow.addProject.ProjectList
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
@@ -18,11 +20,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskFLowTheme {
-//                ProjectList(ProjectsAPIViewModel(), projectViewModel = ProjectViewModel())
+                //UserForm(viewModel = ViewModel())
 
-                TasksList(
-                    apiTaskViewModel = ApiTaskViewModel(),
-                    taskViewModel = taskViewModel(),
+
+                Nav(
                     apiViewModel = ProjectsAPIViewModel()
                 )
             }

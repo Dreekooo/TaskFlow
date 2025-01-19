@@ -16,12 +16,12 @@ interface TasksInterface {
     @POST("tasks/")
     suspend fun addTasks(@Body task: PostTask): Response<Void>
 
-    @DELETE("tasks/{task_id}/")
-    fun deleteTask(@Path("task_id") taskId: Int): Call<Void>
+    @DELETE("tasks/{id}/")
+    fun deleteTask(@Path("id") taskId: Int): Call<Void>
 
-    @PUT("tasks/{task_id}")
+    @PUT("tasks/{id}/")
     fun updateTask(
-        @Path("task_id") task_id: Int,
+        @Path("id") task_id: Int,
         @Body updatedTask: PostTask
     ): Call<Void>
 

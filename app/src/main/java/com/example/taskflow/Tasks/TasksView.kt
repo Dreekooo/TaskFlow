@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,13 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskflow.R
-import com.example.taskflow.addProject.ProjectViewModel
-import com.example.taskflow.addProject.ProjectsAPIViewModel
-import com.example.taskflow.buttons.DeleteButton
 import com.example.taskflow.buttons.DeleteTaskButton
-import com.example.taskflow.buttons.EditButton
 import com.example.taskflow.buttons.EditTaskButton
-import com.example.taskflow.buttons.ProjectsTaskBtn
 import com.example.taskflow.ui.theme.important
 import com.example.taskflow.ui.theme.less
 import com.example.taskflow.ui.theme.normal
@@ -43,6 +36,7 @@ import java.util.Date
 fun TaskView(
     taskID: Int,
     taskName: String,
+    description: String,
     taskType: Int,
     taskCreated: Date,
     taskEnd: Date,
@@ -104,6 +98,15 @@ fun TaskView(
 
             Text(
                 text = "deadline: " + taskViewModel.formatDate(taskEnd),
+                fontFamily = FontFamily(
+                    Font(R.font.font)
+                ),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+
+            Text(
+                text = "discription: " + description,
                 fontFamily = FontFamily(
                     Font(R.font.font)
                 ),

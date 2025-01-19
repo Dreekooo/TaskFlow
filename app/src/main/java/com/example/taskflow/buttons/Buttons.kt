@@ -1,7 +1,5 @@
 package com.example.taskflow.buttons
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,18 +16,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import com.example.taskflow.R
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.PostTask
 import com.example.taskflow.Tasks.taskViewModel
 import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
-import java.util.regex.Pattern
+import java.util.Calendar
 
 @Composable
 fun CloseButton(
@@ -122,63 +118,40 @@ fun SubmitButtonTask(
 ) {
     FloatingActionButton(
         onClick = {
-            val datePattern =
-                "^(0[1-9]|1[0-9]|2[0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(\\d{4})$"
-            val regex = Pattern.compile(datePattern)
+            val calendar = Calendar.getInstance()
+            val today = calendar.time
 
-
-            fun isValidDate(date: String): Boolean {
-                return regex.matcher(date).matches()
-            }
-
-
-            val result = isValidDate("12.01.2025")
-            println("Result: $result")
-
-            taskViewModel.Valid = isValidDate(taskViewModel.date1)
-
-            Log.d("Data123: ", taskViewModel.date1)
-            Log.d("Data123: ", taskViewModel.Valid.toString())
-
-
-            if (!taskViewModel.Valid) {
-                taskViewModel.error = "błąd 1 data"
-            }
-
-            if (!taskViewModel.Valid2) {
-                taskViewModel.error1 = "błąd 2 data"
-            }
-            if (taskViewModel.Valid) {
-                if (taskViewModel.update) {
-                    val taskEdit = taskViewModel.selectedTaskType?.let {
-                        taskViewModel.stringToDate(taskViewModel.date1)?.let { it1 ->
-                            PostTask(
-                                title = taskViewModel.taskTitle,
-                                description = taskViewModel.descriptionTask,
-                                priority = it,
-                                end = it1
-                            )
-                        }
-                    }
+            if (taskViewModel.update) {
+                val postTask = taskViewModel.selectedTaskType?.let {
+                    PostTask(
+                        title = taskViewModel.taskTitle,
+                        description = taskViewModel.descriptionTask,
+                        priority = it,
+                        due_date = today
+                    )
+                }
+                if (postTask != null) {
                     taskViewModel.expandedId?.let {
-                        if (taskEdit != null) {
-                            apiTaskViewModel.updateTaskById(it, taskEdit)
-                        }
+                        apiTaskViewModel.updateTaskById(
+                            task_id = it,
+                            updatedTask = postTask
+                        )
                     }
-                } else {
-                    taskViewModel.selectedTaskType?.let {
-                        taskViewModel.stringToDate(taskViewModel.date1)?.let { it1 ->
-                            apiTaskViewModel.addTask(
-                                taskViewModel.taskTitle,
-                                taskViewModel.descriptionTask,
-                                it,
-                                it1
-                            )
-                        }
-                    }
-                    taskViewModel.onDismissRequest()
+                }
+            } else {
+                taskViewModel.selectedTaskType?.let {
+                    apiTaskViewModel.addTask(
+                        taskViewModel.taskTitle,
+                        taskViewModel.descriptionTask,
+                        it,
+                        today
+                    )
                 }
             }
+
+
+
+            taskViewModel.onDismissRequest()
         },
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
@@ -215,30 +188,19 @@ fun AddProjectButton(
 
 
 fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
-    projectViewModel.parseDateToTimestamp(projectViewModel.deadline)?.let {
-        apiViewModel.addProjectRoles(
-            projectViewModel.projectName,
-            projectViewModel.projectDescription,
-            1,
-            it,
-            apiViewModel.userRoles.value,
-        )
-    }
+    apiViewModel.addProjectRoles(
+        projectViewModel.projectName,
+        projectViewModel.projectDescription,
+        1,
+        apiViewModel.userRoles.value,
+    )
 }
 
 fun editOrAdd(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
-    val deadlineTimestamp = projectViewModel.parseDateToTimestamp(projectViewModel.deadline)
-
-    if (deadlineTimestamp == null) {
-        projectViewModel.projectViewModelError = "Nieprawidłowy format daty"
-        return
-    }
 
     val projectPost = ProjectPost(
         name = projectViewModel.projectName,
         description = projectViewModel.projectDescription,
-        created_by = 1,
-        deadline = deadlineTimestamp
     )
 
     if (projectViewModel.isEdit) {
@@ -384,11 +346,11 @@ fun DeleteTaskButton(
 }
 
 @Composable
-fun ProjectsTaskBtn() {
+fun ProjectsTaskBtn(
+    onNavigate: () -> Unit
+) {
     FloatingActionButton(
-        onClick = {
-
-        },
+        onClick = onNavigate,
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
         contentColor = colorResource(R.color.button_description),
@@ -405,15 +367,8 @@ fun ProjectsTaskBtn() {
 fun dataToEdit(
     projectViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
 ) {
-
     projectViewModel.expandedId?.let { apiViewModel.fetchProjectById(it) }
-
     val project = apiViewModel.selectedProject
-
-
-
     projectViewModel.projectName = project.value?.name ?: ""
     projectViewModel.projectDescription = project.value?.description ?: ""
-
-
 }

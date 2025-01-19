@@ -49,7 +49,8 @@ import com.example.taskflow.buttons.ProjectsTaskBtn
 fun ProjectList(
     apiViewModel: ProjectsAPIViewModel,
     modifier: Modifier = Modifier,
-    projectViewModel: ProjectViewModel
+    projectViewModel: ProjectViewModel,
+    onNavigateToTask: () -> Unit
 ) {
     val projects by apiViewModel.projects.collectAsState()
 
@@ -103,6 +104,7 @@ fun ProjectList(
                         },
                         apiViewModel = apiViewModel,
                         projectViewModel = projectViewModel,
+                        onNavigateToTask = onNavigateToTask
                     )
 
                     Log.d(
@@ -134,7 +136,8 @@ fun ProjectView(
     isExpanded: Boolean,
     onClick: () -> Unit,
     apiViewModel: ProjectsAPIViewModel,
-    projectViewModel: ProjectViewModel
+    projectViewModel: ProjectViewModel,
+    onNavigateToTask: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -201,7 +204,8 @@ fun ProjectView(
             ProjectButtons(
                 apiViewModel = apiViewModel,
                 projectID = projectID,
-                projectViewModel = projectViewModel
+                projectViewModel = projectViewModel,
+                onNavigate = onNavigateToTask
             )
         }
     }
@@ -212,7 +216,8 @@ fun ProjectView(
 fun ProjectButtons(
     apiViewModel: ProjectsAPIViewModel,
     projectViewModel: ProjectViewModel,
-    projectID: Int
+    projectID: Int,
+    onNavigate: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -225,7 +230,9 @@ fun ProjectButtons(
             apiViewModel = apiViewModel,
             projectID = projectID
         )
-        ProjectsTaskBtn()
+        ProjectsTaskBtn(
+            onNavigate
+        )
         EditButton(projectViewModel = projectViewModel, apiViewModel = apiViewModel)
     }
 }

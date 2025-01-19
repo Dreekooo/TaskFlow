@@ -14,8 +14,6 @@ data class Project(
 data class ProjectPost(
     @SerializedName("name") val name: String,
     @SerializedName("description") val description: String,
-    @SerializedName("created_by") val created_by: Int,
-    @SerializedName("created_at") val deadline: Timestamp
 )
 
 

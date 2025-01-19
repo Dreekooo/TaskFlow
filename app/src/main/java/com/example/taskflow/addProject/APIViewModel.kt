@@ -20,7 +20,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.sql.Timestamp
 
 class ProjectsAPIViewModel : ViewModel() {
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
@@ -135,10 +134,9 @@ class ProjectsAPIViewModel : ViewModel() {
         projectName: String,
         projectDescription: String,
         createdBy: Int,
-        deadline: Timestamp,
         userRoles: Map<Int, Set<Int>>
     ) {
-        val project = ProjectPost(projectName, projectDescription, createdBy, deadline)
+        val project = ProjectPost(projectName, projectDescription)
 
         val projectApi = retrofit.create(POSTUsersInterface::class.java)
 

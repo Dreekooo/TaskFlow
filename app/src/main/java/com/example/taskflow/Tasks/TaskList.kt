@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.buttons.AddTasksButton
@@ -23,19 +28,33 @@ import com.example.taskflow.buttons.AddTasksButton
 fun TasksList(
     apiTaskViewModel: ApiTaskViewModel,
     taskViewModel: taskViewModel,
-    apiViewModel: ProjectsAPIViewModel
+    apiViewModel: ProjectsAPIViewModel,
+    onNavigateBack: () -> Unit
 ) {
     val tasks by apiTaskViewModel.tasks.collectAsState()
 
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 20.dp, end = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, end = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(
+                    onClick = onNavigateBack,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "",
+                    )
 
+                }
+            }
+        },
+        bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -43,13 +62,21 @@ fun TasksList(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                AddTasksButton(
-                    taskViewModel,
-                )
-            }
 
-        }
-    }) { innerPadding ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp, end = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    AddTasksButton(
+                        taskViewModel,
+                    )
+                }
+
+            }
+        }) { innerPadding ->
 
         LazyColumn(
             modifier = Modifier
@@ -68,6 +95,7 @@ fun TasksList(
                         taskID = task.id,
                         taskName = task.title,
                         taskType = task.priority,
+                        description = task.description,
                         taskCreated = task.created,
                         taskEnd = task.end,
                         isExpanded = taskViewModel.expandedId == task.id,

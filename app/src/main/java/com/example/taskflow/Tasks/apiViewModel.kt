@@ -3,9 +3,6 @@ package com.example.taskflow.Tasks
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.taskflow.addProject.Project
-import com.example.taskflow.addProject.ProjectInterface
-import com.example.taskflow.addProject.users.User
 import com.example.taskflow.addProject.users.UserInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -95,6 +92,17 @@ class ApiTaskViewModel : ViewModel() {
         }
     }
 
+    fun addTask(taskTitle: String, description: String, type: Int, date: Date) {
+        val task =
+            PostTask(
+                title = taskTitle,
+                description = description,
+                priority = type,
+                due_date = date
+            )
+        addTaskToProject(task)
+    }
+
     fun deleteTaskById(taskId: Int) {
         val apiService: TasksInterface = retrofit.create(TasksInterface::class.java)
         val call = apiService.deleteTask(taskId)
@@ -134,19 +142,6 @@ class ApiTaskViewModel : ViewModel() {
                 println("Wystąpił błąd podczas próby aktualizacji zadania: ${t.message}")
             }
         })
-    }
-
-
-    fun addTask(taskTitle: String, description: String, type: Int, end: java.sql.Date) {
-        val task =
-            PostTask(
-                title = taskTitle,
-                description = description,
-                priority = type,
-                end = end
-            )
-
-        addTaskToProject(task)
     }
 
 }
