@@ -15,4 +15,6 @@ class ViewModel : ViewModel() {
     var resultMessage by mutableStateOf("")
     var userId by mutableStateOf<String?>(null)
     var token by mutableStateOf<String?>(null)
+    var isRegister by mutableStateOf(false)
+
 }

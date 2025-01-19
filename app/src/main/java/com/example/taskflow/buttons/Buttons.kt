@@ -30,9 +30,13 @@ import androidx.compose.ui.unit.dp
 import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.PostTask
 import com.example.taskflow.Tasks.taskViewModel
+import com.example.taskflow.User.ApiViewModel
+import com.example.taskflow.User.UserRegister
+import com.example.taskflow.User.ViewModel
 import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
+import com.example.taskflow.addProject.users.User
 import com.example.taskflow.ui.theme.backgroundDialog
 import java.util.Calendar
 
@@ -266,11 +270,10 @@ fun AddRoleButton(
 }
 
 @Composable
-fun LoginButton(
-) {
+fun LoginButton(viewModel: ViewModel) {
     FloatingActionButton(
         onClick = {
-
+            viewModel.isRegister = false
         },
         modifier = Modifier
             .height(70.dp)
@@ -296,11 +299,10 @@ fun LoginButton(
 
 
 @Composable
-fun RegisterButton(
-) {
+fun RegisterButton(viewModel: ViewModel) {
     FloatingActionButton(
         onClick = {
-
+            viewModel.isRegister = true
         },
         modifier = Modifier
             .height(70.dp)
@@ -327,10 +329,24 @@ fun RegisterButton(
 
 @Composable
 fun Submit(
+    apiviewModel: ApiViewModel,
+    viewModel: ViewModel
 ) {
     FloatingActionButton(
         onClick = {
+            if(viewModel.isRegister){
+                val user = UserRegister(
+                    viewModel.email,
+                    viewModel.username,
+                    viewModel.lastName,
+                    viewModel.password
+                )
+                apiviewModel.registerUser(
+                    user
+                )
+            }else{
 
+            }
         },
         modifier = Modifier
             .height(70.dp)
