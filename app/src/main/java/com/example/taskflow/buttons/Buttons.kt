@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.PostTask
 import com.example.taskflow.Tasks.taskViewModel
@@ -162,9 +163,6 @@ fun SubmitButtonTask(
                     )
                 }
             }
-
-
-
             taskViewModel.onDismissRequest()
         },
         modifier = Modifier.size(70.dp),
@@ -331,7 +329,8 @@ fun RegisterButton(viewModel: ViewModel) {
 @Composable
 fun Submit(
     apiviewModel: ApiViewModel,
-    viewModel: ViewModel
+    viewModel: ViewModel,
+    onNavigate: () -> Unit
 ) {
     FloatingActionButton(
         onClick = {
@@ -343,16 +342,21 @@ fun Submit(
                     viewModel.password,
                     viewModel.firstName
                 )
-                apiviewModel.registerUser(
-                    user
-                )
+                apiviewModel.registerUser(user)
             } else {
-                val login = UserLogin(
-                    viewModel.username,
-                    viewModel.password
-                )
+                val login = UserLogin(viewModel.username, viewModel.password)
                 apiviewModel.loginUser(user = login)
             }
+
+            apiviewModel.token?.let {
+                viewModel.logged = true
+            }
+
+            if (viewModel.logged) {
+                onNavigate()
+                viewModel.loggedUser = viewModel.username
+            }
+
             viewModel.onDismiss()
         },
         modifier = Modifier

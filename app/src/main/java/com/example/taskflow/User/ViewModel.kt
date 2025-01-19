@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class ViewModel : ViewModel() {
+    var loggedUser by mutableStateOf("")
     var username by mutableStateOf("")
     var password by mutableStateOf("")
     var firstName by mutableStateOf("")
@@ -16,7 +17,7 @@ class ViewModel : ViewModel() {
     var userId by mutableStateOf<String?>(null)
     var token by mutableStateOf<String?>(null)
     var isRegister by mutableStateOf(false)
-
+    var logged by mutableStateOf(false)
 
     fun onDismiss() {
         username = ""

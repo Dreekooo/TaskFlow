@@ -17,13 +17,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskFLowTheme {
-                LoginForm(ViewModel(), ApiViewModel())
+                // LoginForm(ViewModel(), ApiViewModel())
 
 
-//                Nav(
-//                    apiViewModel = ProjectsAPIViewModel(),
-//                    projectViewModel = ProjectViewModel()
-//                )
+                Nav(
+                    apiViewModel = ProjectsAPIViewModel(),
+                    projectViewModel = ProjectViewModel(),
+                    ViewModel(), ApiViewModel()
+                )
             }
         }
     }

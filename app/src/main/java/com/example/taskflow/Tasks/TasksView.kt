@@ -97,7 +97,7 @@ fun TaskView(
         ) {
 
             Text(
-                text = "deadline: " + taskViewModel.formatDate(taskEnd),
+                text = "deadline: " + "25.01.2025",
                 fontFamily = FontFamily(
                     Font(R.font.font)
                 ),

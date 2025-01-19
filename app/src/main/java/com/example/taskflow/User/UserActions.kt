@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.taskflow.R
 import com.example.taskflow.User.ApiViewModel
 import com.example.taskflow.User.ViewModel
@@ -43,7 +44,8 @@ import com.example.taskflow.ui.theme.textEdit
 @Composable
 fun LoginForm(
     viewModel: ViewModel,
-    apiViewModel: ApiViewModel
+    apiViewModel: ApiViewModel,
+    onNavigate: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -255,10 +257,14 @@ fun LoginForm(
             )
         )
 
-        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             LoginButton(viewModel)
             RegisterButton(viewModel)
-            Submit(apiviewModel = apiViewModel, viewModel)
+            Submit(apiviewModel = apiViewModel, viewModel, onNavigate)
         }
     }
 }
