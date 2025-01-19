@@ -17,4 +17,12 @@ class ViewModel : ViewModel() {
     var token by mutableStateOf<String?>(null)
     var isRegister by mutableStateOf(false)
 
+
+    fun onDismiss() {
+        username = ""
+        password = ""
+        firstName = ""
+        lastName = ""
+        email = ""
+    }
 }

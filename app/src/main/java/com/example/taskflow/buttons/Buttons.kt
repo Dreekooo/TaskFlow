@@ -31,6 +31,7 @@ import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.PostTask
 import com.example.taskflow.Tasks.taskViewModel
 import com.example.taskflow.User.ApiViewModel
+import com.example.taskflow.User.UserLogin
 import com.example.taskflow.User.UserRegister
 import com.example.taskflow.User.ViewModel
 import com.example.taskflow.addProject.ProjectPost
@@ -334,19 +335,25 @@ fun Submit(
 ) {
     FloatingActionButton(
         onClick = {
-            if(viewModel.isRegister){
+            if (viewModel.isRegister) {
                 val user = UserRegister(
                     viewModel.email,
                     viewModel.username,
                     viewModel.lastName,
-                    viewModel.password
+                    viewModel.password,
+                    viewModel.firstName
                 )
                 apiviewModel.registerUser(
                     user
                 )
-            }else{
-
+            } else {
+                val login = UserLogin(
+                    viewModel.username,
+                    viewModel.password
+                )
+                apiviewModel.loginUser(user = login)
             }
+            viewModel.onDismiss()
         },
         modifier = Modifier
             .height(70.dp)
