@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -328,6 +329,17 @@ func GetLoggedInUserHandler(db *sql.DB) http.HandlerFunc {
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
 			http.Error(w, "Authorization header required", http.StatusUnauthorized)
+			fmt.Println("Authorization header missing")
+			return
+		}
+
+		// Usuń prefiks "Bearer " z tokena
+		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+			fmt.Println("Original token with Bearer:", tokenString)
+			tokenString = tokenString[7:]
+			fmt.Println("Token without Bearer:", tokenString)
+		} else {
+			http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
 			return
 		}
 
@@ -335,6 +347,7 @@ func GetLoggedInUserHandler(db *sql.DB) http.HandlerFunc {
 		claims, err := utils.ValidateToken(tokenString)
 		if err != nil {
 			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			fmt.Println("Token validation error:", err)
 			return
 		}
 

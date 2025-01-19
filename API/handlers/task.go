@@ -5,20 +5,20 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
-	"time"
+	"strconv"
 )
 
 type Task struct {
-	TaskID      int       `json:"task_id"`
-	ProjectID   int       `json:"project_id"`
-	AssignedTo  int       `json:"assigned_to"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Status      int       `json:"status"`     // ID statusu
-	Priority    int       `json:"priority"`   // ID priorytetu
-	StartDate   time.Time `json:"start_date"` // Typ time.Time
-	DueDate     time.Time `json:"due_date"`   // Typ time.Time
-	CreatedBy   int       `json:"created_by"`
+	TaskID      int    `json:"task_id"`
+	ProjectID   int    `json:"project_id"`
+	AssignedTo  int    `json:"assigned_to"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Status      int    `json:"status"`     // ID statusu
+	Priority    int    `json:"priority"`   // ID priorytetu
+	StartDate   string `json:"start_date"` // Format: "YYYY-MM-DD"
+	DueDate     string `json:"due_date"`   // Format: "YYYY-MM-DD"
+	CreatedBy   int    `json:"created_by"`
 }
 
 func CreateTaskHandler(db *sql.DB) http.HandlerFunc {
@@ -30,20 +30,9 @@ func CreateTaskHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Zapytanie SQL do wstawienia zadania
-		query := `
-			INSERT INTO Tasks (project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-		_, err = db.Exec(query,
-			task.ProjectID,
-			task.AssignedTo,
-			task.Title,
-			task.Description,
-			task.Status,
-			task.Priority,
-			task.StartDate.Format("2006-01-02"), // Konwersja na format YYYY-MM-DD
-			task.DueDate.Format("2006-01-02"),   // Konwersja na format YYYY-MM-DD
-			task.CreatedBy,
+		_, err = db.Exec(
+			"INSERT INTO Tasks (project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			task.ProjectID, task.AssignedTo, task.Title, task.Description, task.Status, task.Priority, task.StartDate, task.DueDate, task.CreatedBy,
 		)
 		if err != nil {
 			http.Error(w, "Failed to create task", http.StatusInternalServerError)
@@ -51,45 +40,32 @@ func CreateTaskHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "Task created successfully",
-		})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Task created successfully"})
 	}
 }
 
 func GetTasksHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.Query(`
-			SELECT task_id, project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by 
-			FROM Tasks`)
+		// Zapytanie do bazy danych
+		rows, err := db.Query("SELECT task_id, project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by FROM Tasks")
 		if err != nil {
 			http.Error(w, "Failed to fetch tasks", http.StatusInternalServerError)
 			return
 		}
 		defer rows.Close()
 
+		// Przetwarzanie wyników
 		var tasks []Task
 		for rows.Next() {
 			var task Task
-			err := rows.Scan(
-				&task.TaskID,
-				&task.ProjectID,
-				&task.AssignedTo,
-				&task.Title,
-				&task.Description,
-				&task.Status,
-				&task.Priority,
-				&task.StartDate,
-				&task.DueDate,
-				&task.CreatedBy,
-			)
-			if err != nil {
+			if err := rows.Scan(&task.TaskID, &task.ProjectID, &task.AssignedTo, &task.Title, &task.Description, &task.Status, &task.Priority, &task.StartDate, &task.DueDate, &task.CreatedBy); err != nil {
 				http.Error(w, "Failed to scan task", http.StatusInternalServerError)
 				return
 			}
 			tasks = append(tasks, task)
 		}
 
+		// Wysyłanie odpowiedzi
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(tasks)
 	}
@@ -97,24 +73,21 @@ func GetTasksHandler(db *sql.DB) http.HandlerFunc {
 
 func GetTaskByIdHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := mux.Vars(r)["id"]
+		// Pobranie parametru {id} z adresu URL
+		vars := mux.Vars(r)
+		id := vars["id"]
 
+		// Sprawdź, czy ID jest liczbą
+		taskID, err := strconv.Atoi(id)
+		if err != nil {
+			http.Error(w, "Invalid task ID", http.StatusBadRequest)
+			return
+		}
+
+		// Zapytanie do bazy danych
 		var task Task
-		query := `
-			SELECT task_id, project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by
-			FROM Tasks WHERE task_id = ?`
-		err := db.QueryRow(query, id).Scan(
-			&task.TaskID,
-			&task.ProjectID,
-			&task.AssignedTo,
-			&task.Title,
-			&task.Description,
-			&task.Status,
-			&task.Priority,
-			&task.StartDate, // Automatyczna konwersja na time.Time
-			&task.DueDate,   // Automatyczna konwersja na time.Time
-			&task.CreatedBy,
-		)
+		err = db.QueryRow("SELECT task_id, project_id, assigned_to, title, description, status, priority, start_date, due_date, created_by FROM Tasks WHERE task_id = ?", taskID).
+			Scan(&task.TaskID, &task.ProjectID, &task.AssignedTo, &task.Title, &task.Description, &task.Status, &task.Priority, &task.StartDate, &task.DueDate, &task.CreatedBy)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				http.Error(w, "Task not found", http.StatusNotFound)
@@ -124,6 +97,7 @@ func GetTaskByIdHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Wysyłanie odpowiedzi
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(task)
 	}
@@ -131,69 +105,58 @@ func GetTaskByIdHandler(db *sql.DB) http.HandlerFunc {
 
 func UpdateTaskHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := mux.Vars(r)["id"]
+		// Pobierz ID zadania z URL
+		vars := mux.Vars(r)
+		id := vars["id"]
 
+		taskID, err := strconv.Atoi(id)
+		if err != nil {
+			http.Error(w, "Invalid task ID", http.StatusBadRequest)
+			return
+		}
+
+		// Pobierz dane z żądania
 		var task Task
-		err := json.NewDecoder(r.Body).Decode(&task)
-		if err != nil || task.Title == "" || task.Description == "" {
+		err = json.NewDecoder(r.Body).Decode(&task)
+		if err != nil {
 			http.Error(w, "Invalid input", http.StatusBadRequest)
 			return
 		}
 
-		query := `
-			UPDATE Tasks 
-			SET project_id = ?, assigned_to = ?, title = ?, description = ?, 
-				status = ?, priority = ?, start_date = ?, due_date = ?, updated_at = CURRENT_TIMESTAMP 
-			WHERE task_id = ?`
-		result, err := db.Exec(query,
-			task.ProjectID,
-			task.AssignedTo,
-			task.Title,
-			task.Description,
-			task.Status,
-			task.Priority,
-			task.StartDate.Format("2006-01-02"), // Konwersja na format YYYY-MM-DD
-			task.DueDate.Format("2006-01-02"),   // Konwersja na format YYYY-MM-DD
-			id,
-		)
+		// Aktualizuj zadanie w bazie danych
+		_, err = db.Exec(`
+            UPDATE Tasks
+            SET project_id = ?, assigned_to = ?, title = ?, description = ?, status = ?, priority = ?, start_date = ?, due_date = ?
+            WHERE task_id = ?
+        `, task.ProjectID, task.AssignedTo, task.Title, task.Description, task.Status, task.Priority, task.StartDate, task.DueDate, taskID)
 		if err != nil {
 			http.Error(w, "Failed to update task", http.StatusInternalServerError)
 			return
 		}
 
-		rowsAffected, _ := result.RowsAffected()
-		if rowsAffected == 0 {
-			http.Error(w, "Task not found", http.StatusNotFound)
-			return
-		}
-
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "Task updated successfully",
-		})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Task updated successfully"})
 	}
 }
 
 func DeleteTaskHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := mux.Vars(r)["id"]
+		vars := mux.Vars(r)
+		id := vars["id"]
 
-		query := "DELETE FROM Tasks WHERE task_id = ?"
-		result, err := db.Exec(query, id)
+		taskID, err := strconv.Atoi(id)
+		if err != nil {
+			http.Error(w, "Invalid task ID", http.StatusBadRequest)
+			return
+		}
+
+		_, err = db.Exec("DELETE FROM Tasks WHERE task_id = ?", taskID)
 		if err != nil {
 			http.Error(w, "Failed to delete task", http.StatusInternalServerError)
 			return
 		}
 
-		rowsAffected, _ := result.RowsAffected()
-		if rowsAffected == 0 {
-			http.Error(w, "Task not found", http.StatusNotFound)
-			return
-		}
-
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "Task deleted successfully",
-		})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Task deleted successfully"})
 	}
 }

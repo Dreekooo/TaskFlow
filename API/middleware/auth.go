@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"taskflow/utils"
 )
@@ -14,10 +15,18 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		// Usuń prefiks "Bearer "
+		if strings.HasPrefix(tokenString, "Bearer ") {
+			tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+		} else {
+			http.Error(w, "Invalid Authorization header format", http.StatusUnauthorized)
+			return
+		}
+
 		// Walidacja tokena
 		_, err := utils.ValidateToken(tokenString)
 		if err != nil {
-			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			http.Error(w, "Invalid or expired token: "+err.Error(), http.StatusUnauthorized)
 			return
 		}
 
