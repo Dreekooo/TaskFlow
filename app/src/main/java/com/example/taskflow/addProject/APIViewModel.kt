@@ -31,7 +31,7 @@ class ProjectsAPIViewModel : ViewModel() {
     private val _allUsers = MutableStateFlow<List<User>>(emptyList())
     val allUsers: StateFlow<List<User>> = _allUsers
 
-    private val retrofit: Retrofit = Retrofit.Builder().baseUrl("http://192.168.68.114:8080/")
+    private val retrofit: Retrofit = Retrofit.Builder().baseUrl("http://192.168.68.116:8080/")
         .addConverterFactory(GsonConverterFactory.create()).build()
 
     private val api: ProjectInterface = retrofit.create(ProjectInterface::class.java)

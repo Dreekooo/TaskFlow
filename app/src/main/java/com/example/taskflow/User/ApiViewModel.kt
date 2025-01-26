@@ -15,7 +15,7 @@ class ApiViewModel : ViewModel() {
 
     var token by mutableStateOf<String?>(null)
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.68.114:8080/")
+        .baseUrl("http://192.168.68.116:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
