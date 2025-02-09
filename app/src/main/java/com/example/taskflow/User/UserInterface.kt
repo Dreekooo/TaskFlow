@@ -1,5 +1,6 @@
 package com.example.taskflow.User
 
+import com.example.taskflow.addProject.users.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -13,8 +14,8 @@ interface UserInterface {
     @POST("login/")
     fun login(@Body user: UserLogin): Call<LoginResponse>
 
-    @GET("users/me/")
-    fun getUserData(
-        @Header("Authorization") token: String
-    ): Call<UserLogin>
+
+    @GET("api/users/me/")
+    fun getCurrentUser(@Header("Authorization") token: String): Call<User>
+
 }
