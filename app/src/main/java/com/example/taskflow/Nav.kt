@@ -25,7 +25,7 @@ fun Nav(
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "login"
     ) {
         composable("login") {
             LoginForm(viewModel, userApi, onNavigate = {
