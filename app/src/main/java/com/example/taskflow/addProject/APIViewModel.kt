@@ -136,7 +136,7 @@ class ProjectsAPIViewModel : ViewModel() {
         createdBy: Int,
         userRoles: Map<Int, Set<Int>>
     ) {
-        val project = ProjectPost(projectName, projectDescription)
+        val project = ProjectPost(projectName, projectDescription, createdBy)
 
         val projectApi = retrofit.create(POSTUsersInterface::class.java)
 

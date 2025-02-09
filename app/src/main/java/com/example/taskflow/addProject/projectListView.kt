@@ -39,6 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskflow.R
+import com.example.taskflow.User.ApiViewModel
+import com.example.taskflow.User.ViewModel
 import com.example.taskflow.buttons.AddProjectButton
 import com.example.taskflow.buttons.DeleteButton
 import com.example.taskflow.buttons.EditButton
@@ -50,7 +52,8 @@ fun ProjectList(
     apiViewModel: ProjectsAPIViewModel,
     modifier: Modifier = Modifier,
     projectViewModel: ProjectViewModel,
-    onNavigateToTask: () -> Unit
+    onNavigateToTask: () -> Unit,
+    apiUser: ApiViewModel
 ) {
     val projects by apiViewModel.projects.collectAsState()
 
@@ -126,6 +129,7 @@ fun ProjectList(
     AddProjectDialog(
         projectsViewModel = projectViewModel,
         apiViewModel = apiViewModel,
+        apiUser = apiUser
     )
 }
 

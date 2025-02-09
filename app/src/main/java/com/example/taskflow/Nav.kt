@@ -39,7 +39,8 @@ fun Nav(
                 projectViewModel = projectViewModel,
                 onNavigateToTask = {
                     navController.navigate("task")
-                }
+                },
+                apiUser = userApi
             )
         }
         composable("task") {

@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.taskflow.Tasks.ApiTaskViewModel
 import com.example.taskflow.Tasks.PostTask
 import com.example.taskflow.Tasks.taskViewModel
@@ -38,7 +37,6 @@ import com.example.taskflow.User.ViewModel
 import com.example.taskflow.addProject.ProjectPost
 import com.example.taskflow.addProject.ProjectViewModel
 import com.example.taskflow.addProject.ProjectsAPIViewModel
-import com.example.taskflow.addProject.users.User
 import com.example.taskflow.ui.theme.backgroundDialog
 import java.util.Calendar
 
@@ -109,10 +107,11 @@ fun AddTasksButton(
 fun SubmitButton(
     projectViewModel: ProjectViewModel,
     apiViewModel: ProjectsAPIViewModel,
+    apiUser: ApiViewModel
 ) {
     FloatingActionButton(
         onClick = {
-            editOrAdd(apiViewModel, projectViewModel)
+            editOrAdd(apiViewModel, projectViewModel,apiUser)
         },
         modifier = Modifier.size(70.dp),
         shape = CircleShape,
@@ -199,25 +198,40 @@ fun AddProjectButton(
 }
 
 
-fun fetchProject(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
-    apiViewModel.addProjectRoles(
+fun fetchProject(
+    apiViewModel: ProjectsAPIViewModel,
+    projectViewModel: ProjectViewModel,
+    apiUser: ApiViewModel
+) {
+    apiUser.currentUser?.let {
+        apiViewModel.addProjectRoles(
         projectViewModel.projectName,
         projectViewModel.projectDescription,
-        1,
+            it,
         apiViewModel.userRoles.value,
     )
+    }
 }
 
-fun editOrAdd(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewModel) {
+fun editOrAdd(
+    apiViewModel: ProjectsAPIViewModel,
+    projectViewModel: ProjectViewModel,
+    apiUser: ApiViewModel
+) {
 
-    val projectPost = ProjectPost(
+    val projectPost = apiUser.currentUser?.let {
+        ProjectPost(
         name = projectViewModel.projectName,
         description = projectViewModel.projectDescription,
+            it
     )
+    }
 
     if (projectViewModel.isEdit) {
         projectViewModel.expandedId?.let { projectId ->
-            apiViewModel.updateProjectById(projectId, projectPost)
+            if (projectPost != null) {
+                apiViewModel.updateProjectById(projectId, projectPost)
+            }
 
             apiViewModel.deleteProjectUsersByProjectId(projectId)
 
@@ -229,7 +243,7 @@ fun editOrAdd(apiViewModel: ProjectsAPIViewModel, projectViewModel: ProjectViewM
             }
         }
     } else {
-        fetchProject(apiViewModel, projectViewModel)
+        fetchProject(apiViewModel, projectViewModel, apiUser = apiUser)
     }
     onDismissRequest(projectViewModel, apiViewModel)
 }
@@ -369,10 +383,10 @@ fun Submit(
     ) {
         Text(
             text = "Zatwierdź",
-            textAlign = TextAlign.Center, // Wyśrodkowanie tekstu
+            textAlign = TextAlign.Center,
             modifier = Modifier
-                .fillMaxWidth() // Wypełnia całą szerokość dostępnego miejsca
-                .padding(bottom = 4.dp), // Dodanie paddingu u dołu
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
             color = backgroundDialog,
             fontFamily = FontFamily(
                 Font(R.font.font)

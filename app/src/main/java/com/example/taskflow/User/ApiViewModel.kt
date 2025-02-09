@@ -20,6 +20,8 @@ class ApiViewModel : ViewModel() {
     }
 
     var token by mutableStateOf<String?>(null)
+    public var currentUser by mutableStateOf<Int?>(null)
+
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -69,7 +71,10 @@ class ApiViewModel : ViewModel() {
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 if (response.isSuccessful) {
                     val user = response.body()
-                    Log.d(TAG, "Zalogowany użytkownik ID: ${user?.id}")
+                    if (user != null) {
+                        currentUser = user.id
+                    }
+                    Log.d(TAG, "Zalogowany użytkownik ID: ${currentUser}")
                 } else {
                     Log.e(
                         TAG,

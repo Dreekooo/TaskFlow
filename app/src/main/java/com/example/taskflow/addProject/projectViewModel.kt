@@ -51,7 +51,6 @@ class ProjectViewModel : ViewModel() {
             val parsedDate = dateFormat.parse(date)
             Timestamp(parsedDate.time)
         } catch (e: ParseException) {
-            // Jeśli parsing się nie uda, zwróć null
             null
         }
     }

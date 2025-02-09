@@ -58,6 +58,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import com.example.taskflow.R
+import com.example.taskflow.User.ApiViewModel
+import com.example.taskflow.User.ViewModel
 import com.example.taskflow.buttons.AddRoleButton
 import com.example.taskflow.buttons.CloseButton
 import com.example.taskflow.buttons.CustomRadioButton
@@ -73,7 +75,8 @@ import java.util.Calendar
 
 @Composable
 fun AddProjectDialog(
-    projectsViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel
+    projectsViewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel,
+    apiUser: ApiViewModel
 ) {
     if (projectsViewModel.isDialogShow) {
         Dialog(
@@ -118,7 +121,7 @@ fun AddProjectDialog(
                         projectDescription(projectsViewModel)
                         AllUsers(viewModel = apiViewModel)
                         Spacer(modifier = Modifier.padding(5.dp))
-                        ButtonsProjects(viewModel = projectsViewModel, apiViewModel)
+                        ButtonsProjects(viewModel = projectsViewModel, apiViewModel, apiUser)
                     }
                 }
             }
@@ -356,13 +359,13 @@ fun AllUsers(viewModel: ProjectsAPIViewModel) {
 
 
 @Composable
-fun ButtonsProjects(viewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel) {
+fun ButtonsProjects(viewModel: ProjectViewModel, apiViewModel: ProjectsAPIViewModel, apiUser: ApiViewModel) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CloseButton(viewModel)
-        SubmitButton(viewModel, apiViewModel)
+        SubmitButton(viewModel, apiViewModel, apiUser)
     }
 }
