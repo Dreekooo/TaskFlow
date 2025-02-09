@@ -1,6 +1,9 @@
 package com.example.taskflow.addProject
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taskflow.addProject.projectUsers.POSTUsersInterface
@@ -25,6 +28,7 @@ class ProjectsAPIViewModel : ViewModel() {
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
     val projects: StateFlow<List<Project>> = _projects
 
+    var current = 1
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
 
@@ -39,15 +43,15 @@ class ProjectsAPIViewModel : ViewModel() {
 
 
     init {
-        fetchProjects()
+        fetchProjects(current)
         fetchAllUsers(1)
         startAutoRefresh()
         getAllRole()
     }
 
-    private fun fetchProjects() {
+    private fun fetchProjects(currentUserId: Int) {
         fetchData({ api.getProjects() }, { projects ->
-            _projects.value = projects
+            _projects.value = projects.filter { it.created_by == currentUserId }
         })
     }
 
@@ -80,7 +84,7 @@ class ProjectsAPIViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 try {
-                    fetchProjects()
+                    fetchProjects(current)
                     fetchAllUsers(1)
                     delay(1000)
                     getAllRole()

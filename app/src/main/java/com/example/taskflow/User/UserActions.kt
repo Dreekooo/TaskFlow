@@ -34,6 +34,7 @@ import androidx.navigation.NavController
 import com.example.taskflow.R
 import com.example.taskflow.User.ApiViewModel
 import com.example.taskflow.User.ViewModel
+import com.example.taskflow.addProject.ProjectsAPIViewModel
 import com.example.taskflow.buttons.LoginButton
 import com.example.taskflow.buttons.RegisterButton
 import com.example.taskflow.buttons.Submit
@@ -45,8 +46,14 @@ import com.example.taskflow.ui.theme.textEdit
 fun LoginForm(
     viewModel: ViewModel,
     apiViewModel: ApiViewModel,
-    onNavigate: () -> Unit
+    onNavigate: () -> Unit,
+    projectsAPIViewModel: ProjectsAPIViewModel,
+    userApi: ApiViewModel
 ) {
+
+    if (userApi.currentUser != null) {
+        projectsAPIViewModel.current = userApi.currentUser!!
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -264,7 +271,11 @@ fun LoginForm(
         ) {
             LoginButton(viewModel)
             RegisterButton(viewModel)
-            Submit(apiviewModel = apiViewModel, viewModel, onNavigate)
+            Submit(
+                apiviewModel = apiViewModel,
+                viewModel,
+                onNavigate,
+            )
         }
     }
 }

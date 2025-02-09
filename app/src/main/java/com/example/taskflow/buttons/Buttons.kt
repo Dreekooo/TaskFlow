@@ -205,11 +205,11 @@ fun fetchProject(
 ) {
     apiUser.currentUser?.let {
         apiViewModel.addProjectRoles(
-        projectViewModel.projectName,
-        projectViewModel.projectDescription,
+            projectViewModel.projectName,
+            projectViewModel.projectDescription,
             it,
-        apiViewModel.userRoles.value,
-    )
+            apiViewModel.userRoles.value,
+        )
     }
 }
 
@@ -221,10 +221,10 @@ fun editOrAdd(
 
     val projectPost = apiUser.currentUser?.let {
         ProjectPost(
-        name = projectViewModel.projectName,
-        description = projectViewModel.projectDescription,
+            name = projectViewModel.projectName,
+            description = projectViewModel.projectDescription,
             it
-    )
+        )
     }
 
     if (projectViewModel.isEdit) {

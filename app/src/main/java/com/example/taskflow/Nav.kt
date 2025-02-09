@@ -19,18 +19,25 @@ fun Nav(
     apiViewModel: ProjectsAPIViewModel,
     projectViewModel: ProjectViewModel,
     viewModel: ViewModel,
-    userApi: ApiViewModel
-) {
+    userApi: ApiViewModel,
+
+    ) {
     val navController = rememberNavController()
+
 
     NavHost(
         navController = navController,
         startDestination = "login"
     ) {
         composable("login") {
-            LoginForm(viewModel, userApi, onNavigate = {
-                navController.navigate("home")
-            })
+            LoginForm(
+                viewModel, userApi,
+                onNavigate = {
+                    navController.navigate("home")
+                },
+                userApi = userApi,
+                projectsAPIViewModel = apiViewModel,
+            )
         }
 
         composable("home") {
